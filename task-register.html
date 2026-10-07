@@ -76,13 +76,17 @@
               <label class="field"><span>등록번호</span>
                 <input value="자동 부여" readonly />
               </label>
-              <label class="field"><span>시나리오</span>
-                <input value="감속기 A형 표준작업 V1 · TaskModel 연동" readonly />
+              <label class="field"><span>연결된 TaskModel</span>
+                <input id="tm-name" value="" readonly />
               </label>
             </div>
 
             <div style="margin-top:0.85rem;">
-              <p class="field-label">대상 부품 (component_type) · 복수 선택</p>
+              <div style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:baseline;justify-content:space-between;">
+                <p class="field-label" style="margin:0;">대상 부품 (component_type) · TaskModel 기준 자동 선택</p>
+                <span class="badge" id="comp-source"></span>
+              </div>
+              <p class="help" id="comp-hint" style="margin:0.35rem 0 0.55rem;"></p>
               <div id="comp-groups" class="comp-groups"></div>
             </div>
           </div>
@@ -92,7 +96,7 @@
           <div class="card-h">
             <div>
               <h2>적용 평가기준</h2>
-              <p>task_type × product_category → evaluation_profile</p>
+              <p>task_type × product_category × product_model → TaskModel · NCS</p>
             </div>
             <span class="badge" id="profile-id"></span>
           </div>
@@ -177,41 +181,89 @@
       ).join("") + `<option value="__custom">직접 입력…</option>`;
     }
 
+    function selection() {
+      return {
+        tt: typeSel.value,
+        pc: catSel.value,
+        pm: modelSel.value === "__custom" ? "" : modelSel.value,
+      };
+    }
+
     function renderComponents() {
-      const selected = new Set(["GEAR", "SHAFT", "BEARING", "COVER", "BOLT"]);
-      document.getElementById("comp-groups").innerHTML = UR_DATA.componentGroups.map(g => `
+      const { tt, pc, pm } = selection();
+      const resolved = UR_DATA.resolveComponents(tt, pc, pm);
+      const selected = new Set(resolved.components);
+      const catDefaults = new Set(resolved.categoryDefaults || []);
+
+      const src = document.getElementById("comp-source");
+      const hint = document.getElementById("comp-hint");
+      if (resolved.source === "taskmodel" && resolved.taskModel) {
+        src.textContent = "TaskModel 기준";
+        src.className = "badge";
+        const extras = resolved.components.filter(c => !catDefaults.has(c));
+        const extraTxt = extras.length
+          ? ` · 제품군 기본 대비 추가: ${extras.map(c => UR_DATA.componentLabel(c)).join(", ")}`
+          : "";
+        hint.textContent =
+          `${resolved.taskModel.name}에 등록된 부품을 자동 선택했습니다.${extraTxt} 필요 시 수동으로 조정할 수 있습니다.`;
+        document.getElementById("tm-name").value =
+          `${resolved.taskModel.name} (${resolved.taskModel.id})`;
+      } else {
+        src.textContent = "제품군 기본값";
+        src.className = "badge warn";
+        hint.textContent = resolved.components.length
+          ? `${UR_DATA.productCategoryLabel(pc)} 기본 부품을 적용했습니다. 해당 TaskModel이 없으면 제품군 기본값을 사용합니다.`
+          : "자동 체크할 부품이 없습니다. TaskModel을 등록하거나 수동으로 선택하세요.";
+        document.getElementById("tm-name").value = "연결된 TaskModel 없음 · 제품군 기본값 사용";
+      }
+
+      document.getElementById("comp-groups").innerHTML = UR_DATA.componentGroups.map(g => {
+        const items = g.items;
+        const hasChecked = items.some(it => selected.has(it.code));
+        if (!hasChecked && resolved.source === "taskmodel") {
+          /* TaskModel에 없는 그룹은 접혀 보이게 약하게 — 전부 표시하되 체크만 반영 */
+        }
+        return `
         <div class="comp-group">
           <p class="comp-group-t">${g.group}</p>
           <div class="ms-chips">
-            ${g.items.map(it => `
-              <label class="ms-chip">
-                <input type="checkbox" value="${it.code}" ${selected.has(it.code) ? "checked" : ""} />
+            ${items.map(it => {
+              const on = selected.has(it.code);
+              const fromTm = resolved.source === "taskmodel" && on;
+              const fromCat = resolved.source === "category" && on;
+              return `
+              <label class="ms-chip${fromTm ? " from-tm" : ""}${fromCat ? " from-cat" : ""}">
+                <input type="checkbox" value="${it.code}" ${on ? "checked" : ""} />
                 <span>${it.label}</span>
-              </label>
-            `).join("")}
+              </label>`;
+            }).join("")}
           </div>
-        </div>
-      `).join("");
+        </div>`;
+      }).join("");
     }
 
     function refreshProfile() {
-      const tt = typeSel.value;
-      const pc = catSel.value;
+      const { tt, pc, pm } = selection();
       const profile = UR_DATA.resolveProfile(tt, pc);
+      const tm = UR_DATA.resolveTaskModel(tt, pc, pm);
       const typeMeta = UR_DATA.taskTypes.find(t => t.code === tt);
-      document.getElementById("profile-id").textContent = profile.id;
-      document.getElementById("profile-name").textContent = profile.name;
-      document.getElementById("profile-focus").textContent =
-        `평가 중점: ${typeMeta ? typeMeta.focus : "—"} · 제품군: ${UR_DATA.productCategoryLabel(pc)}`;
+      document.getElementById("profile-id").textContent = tm ? tm.id : profile.id;
+      document.getElementById("profile-name").textContent = tm
+        ? tm.name
+        : profile.name;
+      document.getElementById("profile-focus").textContent = tm
+        ? `TaskModel ${tm.id} · ${UR_DATA.taskTypeLabel(tt)} · ${UR_DATA.productCategoryLabel(pc)} · ${pm || "모델 미지정"} · NCS ${profile.id}`
+        : `평가 중점: ${typeMeta ? typeMeta.focus : "—"} · 제품군 기본 · NCS ${profile.id}`;
       document.getElementById("profile-weights").innerHTML = profile.weights.map(([k, v]) =>
         `<div class="weight-chip"><strong>${k}</strong><span>${v}%</span></div>`
       ).join("");
+      renderComponents();
     }
 
     typeSel.onchange = refreshProfile;
     catSel.onchange = () => { fillModels(); refreshProfile(); };
+    modelSel.onchange = refreshProfile;
     fillModels();
-    renderComponents();
     refreshProfile();
 
     const save = () => toast("세션을 등록했습니다. (로컬 미리보기)");

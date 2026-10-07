@@ -96,6 +96,15 @@ button.tab.active {
   justify-content: flex-end;
 }
 
+.ms-chip.from-tm {
+  border-color: #9ec0f5;
+  background: var(--brand-soft);
+}
+.ms-chip.from-cat {
+  border-color: #e0d4b8;
+  background: #fffaf0;
+}
+
 .hist-list { display: grid; gap: 0.4rem; }
 .hist-item {
   display: flex;

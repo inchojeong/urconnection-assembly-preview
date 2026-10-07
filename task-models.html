@@ -117,7 +117,7 @@
 
         <div class="grid-2" style="margin-top:0.75rem;">
           <section class="card">
-            <div class="card-h"><div><h2>대상 부품 (component_type)</h2></div></div>
+            <div class="card-h"><div><h2>대상 부품 (component_type)</h2><p>이 TaskModel 등록값 · 제품군 기본과 분리</p></div></div>
             <div class="card-b"><div class="chip-list" id="objs"></div></div>
           </section>
           <section class="card">
@@ -140,12 +140,15 @@
     document.getElementById("tm-meta").textContent =
       `${tm.id} · ${UR_DATA.productCategoryLabel(tm.product_category)} · ${tm.product_model} · ${tm.version}`;
     document.getElementById("tm-type").textContent = UR_DATA.taskTypeLabel(tm.task_type);
+    const catDefs = UR_DATA.categoryDefaultComponents[tm.product_category] || [];
+    const extras = (tm.components || []).filter(c => !catDefs.includes(c));
     document.getElementById("tm-info").innerHTML = [
       ["task_type", tm.task_type],
       ["product_category", tm.product_category],
       ["product_model", tm.product_model],
       ["단계 수", localStages.length + "단계"],
       ["예상 총시간", tm.expected_total_sec + "초"],
+      ["제품군 기본 대비 추가", extras.length ? extras.map(c => UR_DATA.componentLabel(c)).join(", ") : "없음"],
     ].map(([k,v]) => `<div class="info-box"><p class="k">${k}</p><p class="v">${v}</p></div>`).join("");
 
     document.getElementById("ep-id").textContent = profile.id;

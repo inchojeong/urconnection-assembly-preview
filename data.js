@@ -75,20 +75,24 @@ window.UR_DATA = {
         { code: "GEAR", label: "기어" },
         { code: "SHAFT", label: "축" },
         { code: "BEARING", label: "베어링" },
+        { code: "ROTOR", label: "로터" },
+        { code: "IMPELLER", label: "임펠러" },
         { code: "PULLEY", label: "풀리" },
         { code: "SPROCKET", label: "스프로킷" },
-        { code: "IMPELLER", label: "임펠러" },
+        { code: "PISTON", label: "피스톤" },
+        { code: "ROD", label: "로드" },
       ],
     },
     {
       group: "체결부품",
       items: [
-        { code: "BOLT", label: "볼트" },
+        { code: "BOLT", label: "볼트/너트" },
         { code: "NUT", label: "너트" },
         { code: "SCREW", label: "나사" },
         { code: "WASHER", label: "와셔" },
         { code: "PIN", label: "핀" },
-        { code: "CLIP", label: "클립" },
+        { code: "CLIP", label: "스냅링/클립" },
+        { code: "FASTENER", label: "체결부품" },
       ],
     },
     {
@@ -96,14 +100,27 @@ window.UR_DATA = {
       items: [
         { code: "COVER", label: "커버" },
         { code: "CASE", label: "케이스" },
+        { code: "CASING", label: "케이싱/커버" },
         { code: "HOUSING", label: "하우징" },
         { code: "BRACKET", label: "브래킷" },
         { code: "FRAME", label: "프레임" },
+        { code: "CYLINDER_BODY", label: "실린더바디" },
+        { code: "VALVE_BODY", label: "밸브바디" },
       ],
     },
     {
-      group: "전달/구동",
+      group: "씰·패킹",
       items: [
+        { code: "SEAL", label: "씰" },
+        { code: "OIL_SEAL", label: "오일씰" },
+        { code: "PACKING", label: "씰/패킹" },
+      ],
+    },
+    {
+      group: "밸브·구동",
+      items: [
+        { code: "STEM", label: "스템" },
+        { code: "DISC", label: "디스크/플러그" },
         { code: "BELT", label: "벨트" },
         { code: "CHAIN", label: "체인" },
         { code: "COUPLING", label: "커플링" },
@@ -117,6 +134,10 @@ window.UR_DATA = {
         { code: "CONNECTOR", label: "커넥터" },
         { code: "SENSOR", label: "센서" },
         { code: "SWITCH", label: "스위치" },
+        { code: "TERMINAL", label: "단자" },
+        { code: "RELAY", label: "릴레이/모듈" },
+        { code: "BREAKER", label: "차단기" },
+        { code: "PCB", label: "PCB/모듈" },
       ],
     },
     {
@@ -130,6 +151,22 @@ window.UR_DATA = {
       ],
     },
   ],
+
+  /* 제품군 기본 자동체크 — TaskModel이 없을 때 fallback */
+  categoryDefaultComponents: {
+    GEARBOX: ["GEAR", "SHAFT", "BEARING", "COVER", "BOLT"],
+    MOTOR: ["SHAFT", "BEARING", "ROTOR", "COVER", "BOLT", "CONNECTOR"],
+    PUMP: ["IMPELLER", "SHAFT", "BEARING", "SEAL", "CASING", "BOLT"],
+    VALVE: ["VALVE_BODY", "STEM", "DISC", "PACKING", "BOLT"],
+    BEARING_SHAFT: ["SHAFT", "BEARING", "HOUSING", "CLIP", "BOLT"],
+    CYLINDER: ["PISTON", "ROD", "SEAL", "CYLINDER_BODY", "COVER", "BOLT"],
+    MECHANICAL_UNIT: ["SHAFT", "BEARING", "GEAR", "BRACKET", "COVER", "BOLT"],
+    ELECTRICAL_UNIT: ["CABLE", "CONNECTOR", "SENSOR", "PCB", "COVER", "FASTENER"],
+    PANEL: ["CABLE", "CONNECTOR", "TERMINAL", "SWITCH", "RELAY", "BREAKER"],
+    PIPING: ["PIPE", "HOSE", "FITTING", "FLANGE", "VALVE_PART", "BOLT"],
+    AUTOMOTIVE_COMPONENT: ["SHAFT", "BEARING", "GEAR", "BOLT", "BRACKET", "CONNECTOR"],
+    ETC: [],
+  },
 
   evaluationProfiles: {
     "DISASSEMBLY_ASSEMBLY|GEARBOX": {
@@ -221,41 +258,130 @@ window.UR_DATA = {
     );
   },
 
-  taskModel: {
-    id: "TM-GEAR-A-012",
-    name: "감속기 A형 분해·재조립 V1",
-    task_type: "DISASSEMBLY_ASSEMBLY",
-    product_category: "GEARBOX",
-    product_model: "감속기 A형",
-    version: "V1",
-    stage_count: 13,
-    expected_total_sec: 350,
-    components: ["GEAR", "SHAFT", "BEARING", "COVER", "BOLT"],
-    /* stage_name = 제품별 세부 작업명 (작업 기준 사전 등록)
-       operation_type = 시스템 고정 카테고리 */
-    stages: [
-      { stage_id: "S1", sequence: 1, stage_name: "상부 커버 볼트 해제", operation_type: "UNFASTEN", target: "볼트", tool: "렌치", expected_time: 25 },
-      { stage_id: "S2", sequence: 2, stage_name: "상부 커버 분리", operation_type: "REMOVE", target: "커버", tool: "손", expected_time: 16 },
-      { stage_id: "S3", sequence: 3, stage_name: "구동축 고정 볼트 해제", operation_type: "UNFASTEN", target: "볼트", tool: "렌치", expected_time: 32 },
-      { stage_id: "S4", sequence: 4, stage_name: "구동축 분리", operation_type: "REMOVE", target: "축", tool: "지그", expected_time: 22 },
-      { stage_id: "S5", sequence: 5, stage_name: "1단 기어 분리", operation_type: "REMOVE", target: "기어", tool: "풀러", expected_time: 31 },
-      { stage_id: "S6", sequence: 6, stage_name: "기어 및 축 상태 확인", operation_type: "INSPECT", target: "기어/축", tool: "-", expected_time: 19 },
-      { stage_id: "S7", sequence: 7, stage_name: "구동축 삽입", operation_type: "INSERT", target: "축", tool: "지그", expected_time: 24 },
-      { stage_id: "S8", sequence: 8, stage_name: "기어 위치 정렬", operation_type: "ALIGN", target: "기어", tool: "손", expected_time: 26 },
-      { stage_id: "S9", sequence: 9, stage_name: "1단 기어 결합", operation_type: "JOIN", target: "기어", tool: "손", expected_time: 22 },
-      { stage_id: "S10", sequence: 10, stage_name: "구동축 고정 볼트 체결", operation_type: "FASTEN", target: "볼트", tool: "토크렌치", expected_time: 34 },
-      { stage_id: "S11", sequence: 11, stage_name: "상부 커버 장착", operation_type: "INSERT", target: "커버", tool: "손", expected_time: 29 },
-      { stage_id: "S12", sequence: 12, stage_name: "상부 커버 볼트 체결", operation_type: "FASTEN", target: "볼트", tool: "토크렌치", expected_time: 39 },
-      { stage_id: "S13", sequence: 13, stage_name: "조립 완료 확인", operation_type: "FUNCTION_TEST", target: "조립체", tool: "-", expected_time: 19 },
-    ],
-    tools: ["렌치", "풀러", "지그", "토크렌치"],
-    evaluation_rules: [
-      "표준 순서 정합",
-      "단계별 기준시간 편차",
-      "공구 재탐색·교체",
-      "재작업·반복 동작",
-      "기어 맞물림·축 정렬",
-    ],
+  /* TaskModel 목록 — task_type × product_category × product_model */
+  taskModels: [
+    {
+      id: "TM-GEAR-A-012",
+      name: "감속기 A형 분해·재조립 V1",
+      task_type: "DISASSEMBLY_ASSEMBLY",
+      product_category: "GEARBOX",
+      product_model: "감속기 A형",
+      version: "V1",
+      stage_count: 13,
+      expected_total_sec: 350,
+      /* 제품군 기본(기어·축·베어링·커버·볼트) + 오일씰 */
+      components: ["GEAR", "SHAFT", "BEARING", "COVER", "BOLT", "OIL_SEAL"],
+      stages: [
+        { stage_id: "S1", sequence: 1, stage_name: "상부 커버 볼트 해제", operation_type: "UNFASTEN", target: "볼트", tool: "렌치", expected_time: 25 },
+        { stage_id: "S2", sequence: 2, stage_name: "상부 커버 분리", operation_type: "REMOVE", target: "커버", tool: "손", expected_time: 16 },
+        { stage_id: "S3", sequence: 3, stage_name: "구동축 고정 볼트 해제", operation_type: "UNFASTEN", target: "볼트", tool: "렌치", expected_time: 32 },
+        { stage_id: "S4", sequence: 4, stage_name: "구동축 분리", operation_type: "REMOVE", target: "축", tool: "지그", expected_time: 22 },
+        { stage_id: "S5", sequence: 5, stage_name: "1단 기어 분리", operation_type: "REMOVE", target: "기어", tool: "풀러", expected_time: 31 },
+        { stage_id: "S6", sequence: 6, stage_name: "기어 및 축 상태 확인", operation_type: "INSPECT", target: "기어/축", tool: "-", expected_time: 19 },
+        { stage_id: "S7", sequence: 7, stage_name: "구동축 삽입", operation_type: "INSERT", target: "축", tool: "지그", expected_time: 24 },
+        { stage_id: "S8", sequence: 8, stage_name: "기어 위치 정렬", operation_type: "ALIGN", target: "기어", tool: "손", expected_time: 26 },
+        { stage_id: "S9", sequence: 9, stage_name: "1단 기어 결합", operation_type: "JOIN", target: "기어", tool: "손", expected_time: 22 },
+        { stage_id: "S10", sequence: 10, stage_name: "구동축 고정 볼트 체결", operation_type: "FASTEN", target: "볼트", tool: "토크렌치", expected_time: 34 },
+        { stage_id: "S11", sequence: 11, stage_name: "상부 커버 장착", operation_type: "INSERT", target: "커버", tool: "손", expected_time: 29 },
+        { stage_id: "S12", sequence: 12, stage_name: "상부 커버 볼트 체결", operation_type: "FASTEN", target: "볼트", tool: "토크렌치", expected_time: 39 },
+        { stage_id: "S13", sequence: 13, stage_name: "조립 완료 확인", operation_type: "FUNCTION_TEST", target: "조립체", tool: "-", expected_time: 19 },
+      ],
+      tools: ["렌치", "풀러", "지그", "토크렌치"],
+      evaluation_rules: [
+        "표준 순서 정합",
+        "단계별 기준시간 편차",
+        "공구 재탐색·교체",
+        "재작업·반복 동작",
+        "기어 맞물림·축 정렬",
+      ],
+    },
+    {
+      id: "TM-GEAR-K87-001",
+      name: "K87 감속기 분해·재조립 V1",
+      task_type: "DISASSEMBLY_ASSEMBLY",
+      product_category: "GEARBOX",
+      product_model: "K87 감속기",
+      version: "V1",
+      stage_count: 10,
+      expected_total_sec: 320,
+      components: ["GEAR", "SHAFT", "BEARING", "COVER", "BOLT"],
+      stages: [],
+      tools: ["렌치", "풀러"],
+      evaluation_rules: ["표준 순서 정합"],
+    },
+    {
+      id: "TM-PANEL-01-001",
+      name: "제어반 PANEL-01 분해·재조립 V1",
+      task_type: "DISASSEMBLY_ASSEMBLY",
+      product_category: "PANEL",
+      product_model: "제어반 PANEL-01",
+      version: "V1",
+      stage_count: 8,
+      expected_total_sec: 280,
+      components: ["CABLE", "CONNECTOR", "TERMINAL", "SWITCH", "RELAY", "BREAKER"],
+      stages: [],
+      tools: ["드라이버", "압착기"],
+      evaluation_rules: ["배선 정확성", "연결 누락"],
+    },
+    {
+      id: "TM-PUMP-P100-001",
+      name: "원심펌프 P-100 분해·재조립 V1",
+      task_type: "DISASSEMBLY_ASSEMBLY",
+      product_category: "PUMP",
+      product_model: "원심펌프 P-100",
+      version: "V1",
+      stage_count: 9,
+      expected_total_sec: 300,
+      components: ["IMPELLER", "SHAFT", "BEARING", "SEAL", "CASING", "BOLT"],
+      stages: [],
+      tools: ["렌치", "풀러"],
+      evaluation_rules: ["씰·누수", "임펠러 정렬"],
+    },
+  ],
+
+  resolveTaskModel(taskType, productCategory, productModel) {
+    const exact = this.taskModels.find(
+      (m) =>
+        m.task_type === taskType &&
+        m.product_category === productCategory &&
+        m.product_model === productModel
+    );
+    if (exact) return exact;
+    return this.taskModels.find(
+      (m) => m.task_type === taskType && m.product_category === productCategory
+    ) || null;
+  },
+
+  /* TaskModel 부품 우선, 없으면 제품군 기본값 */
+  resolveComponents(taskType, productCategory, productModel) {
+    const tm = this.resolveTaskModel(taskType, productCategory, productModel);
+    if (tm && tm.components && tm.components.length) {
+      return {
+        components: tm.components.slice(),
+        source: "taskmodel",
+        taskModel: tm,
+        categoryDefaults: this.categoryDefaultComponents[productCategory] || [],
+      };
+    }
+    return {
+      components: (this.categoryDefaultComponents[productCategory] || []).slice(),
+      source: "category",
+      taskModel: null,
+      categoryDefaults: this.categoryDefaultComponents[productCategory] || [],
+    };
+  },
+
+  componentLabel(code) {
+    for (const g of this.componentGroups) {
+      const it = g.items.find((x) => x.code === code);
+      if (it) return it.label;
+    }
+    return code;
+  },
+
+  /* 하위 호환: 기존 화면은 taskModel 단수 참조 */
+  get taskModel() {
+    return this.taskModels[0];
   },
 
   /* 등급기준 (관리자 설정) — NCS 평균 1~5 */
