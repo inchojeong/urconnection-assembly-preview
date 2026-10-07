@@ -82,12 +82,16 @@
             </div>
 
             <div style="margin-top:0.85rem;">
-              <div style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:baseline;justify-content:space-between;">
-                <p class="field-label" style="margin:0;">대상 부품 (component_type) · TaskModel 기준 자동 선택</p>
-                <span class="badge" id="comp-source"></span>
+              <div style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;justify-content:space-between;">
+                <p class="field-label" style="margin:0;">대상 부품 (component_type) · 복수 선택</p>
+                <div style="display:flex;gap:0.35rem;align-items:center;">
+                  <span class="badge" id="comp-source"></span>
+                  <button type="button" class="btn sm" id="btn-reselect">다시 자동선택</button>
+                </div>
               </div>
-              <p class="help" id="comp-hint" style="margin:0.35rem 0 0.55rem;"></p>
-              <div id="comp-groups" class="comp-groups"></div>
+              <p class="help" id="comp-hint" style="margin:0.35rem 0 0.45rem;"></p>
+              <div class="auto-picked" id="auto-picked"></div>
+              <div id="comp-groups" class="comp-groups" style="margin-top:0.65rem;"></div>
             </div>
           </div>
         </section>
@@ -189,80 +193,114 @@
       };
     }
 
-    function renderComponents() {
+    function applyAutoComponents() {
       const { tt, pc, pm } = selection();
       const resolved = UR_DATA.resolveComponents(tt, pc, pm);
       const selected = new Set(resolved.components);
       const catDefaults = new Set(resolved.categoryDefaults || []);
-
       const src = document.getElementById("comp-source");
       const hint = document.getElementById("comp-hint");
+      const picked = document.getElementById("auto-picked");
+
       if (resolved.source === "taskmodel" && resolved.taskModel) {
-        src.textContent = "TaskModel 기준";
+        src.textContent = "TaskModel 자동선택";
         src.className = "badge";
-        const extras = resolved.components.filter(c => !catDefaults.has(c));
-        const extraTxt = extras.length
-          ? ` · 제품군 기본 대비 추가: ${extras.map(c => UR_DATA.componentLabel(c)).join(", ")}`
-          : "";
+        const extras = resolved.components.filter((c) => !catDefaults.has(c));
         hint.textContent =
-          `${resolved.taskModel.name}에 등록된 부품을 자동 선택했습니다.${extraTxt} 필요 시 수동으로 조정할 수 있습니다.`;
+          `${UR_DATA.taskTypeLabel(tt)} · ${UR_DATA.productCategoryLabel(pc)} · ${pm || "모델"} → ${resolved.taskModel.name}` +
+          (extras.length ? ` (추가: ${extras.map((c) => UR_DATA.componentLabel(c)).join(", ")})` : "");
         document.getElementById("tm-name").value =
           `${resolved.taskModel.name} (${resolved.taskModel.id})`;
+      } else if (resolved.source === "tasktype") {
+        src.textContent = "작업유형 자동선택";
+        src.className = "badge";
+        hint.textContent =
+          `${UR_DATA.taskTypeLabel(tt)} × ${UR_DATA.productCategoryLabel(pc)} 기준으로 부품을 자동 선택했습니다. TaskModel이 없으면 이 매핑을 사용합니다.`;
+        document.getElementById("tm-name").value = "연결된 TaskModel 없음 · 작업유형×제품군 매핑 사용";
       } else {
         src.textContent = "제품군 기본값";
         src.className = "badge warn";
         hint.textContent = resolved.components.length
-          ? `${UR_DATA.productCategoryLabel(pc)} 기본 부품을 적용했습니다. 해당 TaskModel이 없으면 제품군 기본값을 사용합니다.`
-          : "자동 체크할 부품이 없습니다. TaskModel을 등록하거나 수동으로 선택하세요.";
+          ? `${UR_DATA.productCategoryLabel(pc)} 기본 부품을 적용했습니다.`
+          : "자동 체크할 부품이 없습니다. 수동으로 선택하세요.";
         document.getElementById("tm-name").value = "연결된 TaskModel 없음 · 제품군 기본값 사용";
       }
 
-      document.getElementById("comp-groups").innerHTML = UR_DATA.componentGroups.map(g => {
-        const items = g.items;
-        const hasChecked = items.some(it => selected.has(it.code));
-        if (!hasChecked && resolved.source === "taskmodel") {
-          /* TaskModel에 없는 그룹은 접혀 보이게 약하게 — 전부 표시하되 체크만 반영 */
-        }
-        return `
-        <div class="comp-group">
-          <p class="comp-group-t">${g.group}</p>
-          <div class="ms-chips">
-            ${items.map(it => {
-              const on = selected.has(it.code);
-              const fromTm = resolved.source === "taskmodel" && on;
-              const fromCat = resolved.source === "category" && on;
-              return `
-              <label class="ms-chip${fromTm ? " from-tm" : ""}${fromCat ? " from-cat" : ""}">
-                <input type="checkbox" value="${it.code}" ${on ? "checked" : ""} />
-                <span>${it.label}</span>
-              </label>`;
-            }).join("")}
-          </div>
-        </div>`;
-      }).join("");
+      picked.innerHTML = resolved.components.length
+        ? `<p class="auto-picked-t">자동 선택 ${resolved.components.length}개</p>` +
+          resolved.components
+            .map((c) => `<span class="auto-chip">${UR_DATA.componentLabel(c)}</span>`)
+            .join("")
+        : `<p class="help" style="margin:0;">선택된 부품 없음</p>`;
+
+      document.getElementById("comp-groups").innerHTML = UR_DATA.componentGroups
+        .map((g) => {
+          const items = g.items;
+          const anyOn = items.some((it) => selected.has(it.code));
+          return `
+          <div class="comp-group${anyOn ? "" : " dimmed"}">
+            <p class="comp-group-t">${g.group}</p>
+            <div class="ms-chips">
+              ${items
+                .map((it) => {
+                  const on = selected.has(it.code);
+                  return `<label class="ms-chip${on ? " is-on" : ""}">
+                    <input type="checkbox" value="${it.code}" ${on ? "checked" : ""} />
+                    <span>${it.label}</span>
+                  </label>`;
+                })
+                .join("")}
+            </div>
+          </div>`;
+        })
+        .join("");
+
+      /* checked 속성 재적용 (브라우저 호환) */
+      document.querySelectorAll("#comp-groups input[type=checkbox]").forEach((el) => {
+        el.checked = selected.has(el.value);
+        el.closest(".ms-chip").classList.toggle("is-on", el.checked);
+        el.addEventListener("change", () => {
+          el.closest(".ms-chip").classList.toggle("is-on", el.checked);
+          syncPickedFromDom();
+        });
+      });
+    }
+
+    function syncPickedFromDom() {
+      const codes = [...document.querySelectorAll("#comp-groups input:checked")].map((el) => el.value);
+      const picked = document.getElementById("auto-picked");
+      picked.innerHTML = codes.length
+        ? `<p class="auto-picked-t">선택 ${codes.length}개</p>` +
+          codes.map((c) => `<span class="auto-chip">${UR_DATA.componentLabel(c)}</span>`).join("")
+        : `<p class="help" style="margin:0;">선택된 부품 없음</p>`;
     }
 
     function refreshProfile() {
       const { tt, pc, pm } = selection();
       const profile = UR_DATA.resolveProfile(tt, pc);
       const tm = UR_DATA.resolveTaskModel(tt, pc, pm);
-      const typeMeta = UR_DATA.taskTypes.find(t => t.code === tt);
+      const typeMeta = UR_DATA.taskTypes.find((t) => t.code === tt);
       document.getElementById("profile-id").textContent = tm ? tm.id : profile.id;
-      document.getElementById("profile-name").textContent = tm
-        ? tm.name
-        : profile.name;
+      document.getElementById("profile-name").textContent = tm ? tm.name : profile.name;
       document.getElementById("profile-focus").textContent = tm
         ? `TaskModel ${tm.id} · ${UR_DATA.taskTypeLabel(tt)} · ${UR_DATA.productCategoryLabel(pc)} · ${pm || "모델 미지정"} · NCS ${profile.id}`
-        : `평가 중점: ${typeMeta ? typeMeta.focus : "—"} · 제품군 기본 · NCS ${profile.id}`;
-      document.getElementById("profile-weights").innerHTML = profile.weights.map(([k, v]) =>
-        `<div class="weight-chip"><strong>${k}</strong><span>${v}%</span></div>`
-      ).join("");
-      renderComponents();
+        : `평가 중점: ${typeMeta ? typeMeta.focus : "—"} · ${UR_DATA.taskTypeLabel(tt)} × ${UR_DATA.productCategoryLabel(pc)} · NCS ${profile.id}`;
+      document.getElementById("profile-weights").innerHTML = profile.weights
+        .map(([k, v]) => `<div class="weight-chip"><strong>${k}</strong><span>${v}%</span></div>`)
+        .join("");
+      applyAutoComponents();
     }
 
-    typeSel.onchange = refreshProfile;
-    catSel.onchange = () => { fillModels(); refreshProfile(); };
-    modelSel.onchange = refreshProfile;
+    typeSel.addEventListener("change", refreshProfile);
+    catSel.addEventListener("change", () => {
+      fillModels();
+      refreshProfile();
+    });
+    modelSel.addEventListener("change", refreshProfile);
+    document.getElementById("btn-reselect").addEventListener("click", () => {
+      applyAutoComponents();
+      toast("작업유형·제품군 기준으로 부품을 다시 선택했습니다.");
+    });
     fillModels();
     refreshProfile();
 

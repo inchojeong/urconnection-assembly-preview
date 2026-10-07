@@ -152,7 +152,7 @@ window.UR_DATA = {
     },
   ],
 
-  /* 제품군 기본 자동체크 — TaskModel이 없을 때 fallback */
+  /* 제품군 기본 자동체크 — TaskModel·작업유형 매핑이 없을 때 fallback */
   categoryDefaultComponents: {
     GEARBOX: ["GEAR", "SHAFT", "BEARING", "COVER", "BOLT"],
     MOTOR: ["SHAFT", "BEARING", "ROTOR", "COVER", "BOLT", "CONNECTOR"],
@@ -166,6 +166,39 @@ window.UR_DATA = {
     PIPING: ["PIPE", "HOSE", "FITTING", "FLANGE", "VALVE_PART", "BOLT"],
     AUTOMOTIVE_COMPONENT: ["SHAFT", "BEARING", "GEAR", "BOLT", "BRACKET", "CONNECTOR"],
     ETC: [],
+  },
+
+  /* 작업유형 × 제품군 — TaskModel 없을 때 작업유형에 따라 자동 선택 */
+  taskTypeCategoryComponents: {
+    "DISASSEMBLY|GEARBOX": ["GEAR", "SHAFT", "BEARING", "COVER", "BOLT"],
+    "ASSEMBLY|GEARBOX": ["GEAR", "SHAFT", "BEARING", "COVER", "BOLT", "OIL_SEAL"],
+    "DISASSEMBLY_ASSEMBLY|GEARBOX": ["GEAR", "SHAFT", "BEARING", "COVER", "BOLT"],
+    "REPLACEMENT|GEARBOX": ["GEAR", "BEARING", "SEAL", "OIL_SEAL", "BOLT"],
+    "INSPECTION_MAINTENANCE|GEARBOX": ["GEAR", "SHAFT", "BEARING", "SEAL", "OIL_SEAL"],
+
+    "DISASSEMBLY|MOTOR": ["SHAFT", "BEARING", "ROTOR", "COVER", "BOLT", "CONNECTOR"],
+    "ASSEMBLY|MOTOR": ["SHAFT", "BEARING", "ROTOR", "COVER", "BOLT", "CONNECTOR"],
+    "DISASSEMBLY_ASSEMBLY|MOTOR": ["SHAFT", "BEARING", "ROTOR", "COVER", "BOLT", "CONNECTOR"],
+    "REPLACEMENT|MOTOR": ["BEARING", "ROTOR", "CONNECTOR", "BOLT"],
+    "INSPECTION_MAINTENANCE|MOTOR": ["SHAFT", "BEARING", "ROTOR", "SENSOR"],
+
+    "DISASSEMBLY|PUMP": ["IMPELLER", "SHAFT", "BEARING", "SEAL", "CASING", "BOLT"],
+    "ASSEMBLY|PUMP": ["IMPELLER", "SHAFT", "BEARING", "SEAL", "CASING", "BOLT"],
+    "DISASSEMBLY_ASSEMBLY|PUMP": ["IMPELLER", "SHAFT", "BEARING", "SEAL", "CASING", "BOLT"],
+    "REPLACEMENT|PUMP": ["IMPELLER", "SEAL", "BEARING", "BOLT"],
+    "INSPECTION_MAINTENANCE|PUMP": ["IMPELLER", "SHAFT", "SEAL", "BEARING"],
+
+    "DISASSEMBLY|PANEL": ["CABLE", "CONNECTOR", "TERMINAL", "SWITCH", "RELAY", "BREAKER"],
+    "ASSEMBLY|PANEL": ["CABLE", "CONNECTOR", "TERMINAL", "SWITCH", "RELAY", "BREAKER"],
+    "DISASSEMBLY_ASSEMBLY|PANEL": ["CABLE", "CONNECTOR", "TERMINAL", "SWITCH", "RELAY", "BREAKER"],
+    "REPLACEMENT|PANEL": ["CABLE", "CONNECTOR", "RELAY", "BREAKER"],
+    "INSPECTION_MAINTENANCE|PANEL": ["CABLE", "CONNECTOR", "TERMINAL", "SWITCH"],
+
+    "DISASSEMBLY|VALVE": ["VALVE_BODY", "STEM", "DISC", "PACKING", "BOLT"],
+    "ASSEMBLY|VALVE": ["VALVE_BODY", "STEM", "DISC", "PACKING", "BOLT"],
+    "DISASSEMBLY_ASSEMBLY|VALVE": ["VALVE_BODY", "STEM", "DISC", "PACKING", "BOLT"],
+    "REPLACEMENT|VALVE": ["DISC", "PACKING", "STEM", "BOLT"],
+    "INSPECTION_MAINTENANCE|VALVE": ["STEM", "DISC", "PACKING", "SEAL"],
   },
 
   evaluationProfiles: {
@@ -352,22 +385,37 @@ window.UR_DATA = {
     ) || null;
   },
 
-  /* TaskModel 부품 우선, 없으면 제품군 기본값 */
+  /* 1) TaskModel 2) 작업유형×제품군 3) 제품군 기본값 */
   resolveComponents(taskType, productCategory, productModel) {
+    const categoryDefaults = this.categoryDefaultComponents[productCategory] || [];
+    const typeKey = `${taskType}|${productCategory}`;
+    const typeDefaults = this.taskTypeCategoryComponents[typeKey] || null;
     const tm = this.resolveTaskModel(taskType, productCategory, productModel);
+
     if (tm && tm.components && tm.components.length) {
       return {
         components: tm.components.slice(),
         source: "taskmodel",
         taskModel: tm,
-        categoryDefaults: this.categoryDefaultComponents[productCategory] || [],
+        categoryDefaults,
+        typeDefaults: typeDefaults || categoryDefaults,
+      };
+    }
+    if (typeDefaults && typeDefaults.length) {
+      return {
+        components: typeDefaults.slice(),
+        source: "tasktype",
+        taskModel: null,
+        categoryDefaults,
+        typeDefaults,
       };
     }
     return {
-      components: (this.categoryDefaultComponents[productCategory] || []).slice(),
+      components: categoryDefaults.slice(),
       source: "category",
       taskModel: null,
-      categoryDefaults: this.categoryDefaultComponents[productCategory] || [],
+      categoryDefaults,
+      typeDefaults: categoryDefaults,
     };
   },
 
