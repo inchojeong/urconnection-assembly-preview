@@ -1,0 +1,74 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UR Connection · 분석 진행</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+  <link rel="stylesheet" href="shared-extra.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside class="rail">
+      <div class="rail-brand"><div class="mark">UR</div><div><p class="name">UR Connection</p><p class="ver">local preview</p></div></div>
+      <p class="rail-sec">WORKSPACE</p>
+      <nav class="rail-nav" data-shell-nav></nav>
+      <div class="rail-foot">
+        <div class="user-chip"><div class="avatar">AD</div><div><strong>관리자</strong><span>Administrator</span></div></div>
+        <button type="button" class="logout">로그아웃</button>
+      </div>
+    </aside>
+    <div class="content">
+      <header class="topbar">
+        <div>
+          <h1>분석·평가 현황</h1>
+          <p class="meta">AI 분석 중 · 대기 · 완료 · 실패</p>
+        </div>
+        <div class="top-actions">
+          <a class="btn primary" href="analysis-result.html">상세</a>
+        </div>
+      </header>
+      <main class="main">
+        <section class="card">
+          <div class="card-h">
+            <div>
+              <h2>분석 파이프라인</h2>
+              <p>감속기 A형 분해·조립 · gearbox_lee_01.mp4</p>
+            </div>
+            <span class="badge warn">진행 중</span>
+          </div>
+          <div class="card-b">
+            <div class="pipe" id="pipe"></div>
+          </div>
+        </section>
+        <section class="card">
+          <div class="card-h"><div><h2>분석 항목</h2><p>분해·조립 기준으로 추적하는 신호</p></div></div>
+          <div class="card-b">
+            <div class="info-row">
+              <div class="info-box"><p class="k">작업자 인식</p><p class="v">진행</p></div>
+              <div class="info-box"><p class="k">손/관절 추적</p><p class="v">진행</p></div>
+              <div class="info-box"><p class="k">작업 대상 객체</p><p class="v">진행</p></div>
+              <div class="info-box"><p class="k">공구 인식</p><p class="v">진행</p></div>
+              <div class="info-box"><p class="k">작업단계 인식</p><p class="v">대기</p></div>
+              <div class="info-box"><p class="k">작업 순서 분석</p><p class="v">대기</p></div>
+              <div class="info-box"><p class="k">단계별 소요시간</p><p class="v">대기</p></div>
+              <div class="info-box"><p class="k">반복/재작업</p><p class="v">대기</p></div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+  <script src="data.js"></script>
+  <script src="shared.js"></script>
+  <script>
+    mountShell("progress");
+    document.getElementById("pipe").innerHTML = UR_DATA.analysis.progress_steps.map(s => {
+      const cls = s.done ? "done" : (s.current ? "current" : "");
+      const st = s.done ? "완료" : (s.current ? "진행 중" : "대기");
+      return `<div class="pipe-step ${cls}"><div class="pipe-dot"></div><div><strong>${s.name}</strong><br /><span>${st}</span></div></div>`;
+    }).join("");
+  </script>
+</body>
+</html>

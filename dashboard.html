@@ -1,0 +1,88 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UR Connection · 대시보드</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+  <link rel="stylesheet" href="shared-extra.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside class="rail">
+      <div class="rail-brand"><div class="mark">UR</div><div><p class="name">UR Connection</p><p class="ver">local preview</p></div></div>
+      <p class="rail-sec">WORKSPACE</p>
+      <nav class="rail-nav" data-shell-nav></nav>
+      <div class="rail-foot">
+        <div class="user-chip"><div class="avatar">AD</div><div><strong>관리자</strong><span>Administrator</span></div></div>
+        <button type="button" class="logout">로그아웃</button>
+      </div>
+    </aside>
+    <div class="content">
+      <header class="topbar">
+        <div>
+          <h1>대시보드</h1>
+          <p class="meta">숙련도 등급 분포 · AI·전문가 평가 비교 · 최근 숙련도 평가</p>
+        </div>
+        <div class="top-actions">
+          <a class="btn" href="task-register.html">평가 세션 등록</a>
+          <a class="btn primary" href="analysis-result.html">숙련도 평가</a>
+        </div>
+      </header>
+      <main class="main">
+        <div class="kpi-grid" id="kpis"></div>
+        <section class="card" style="margin-top:0.75rem;">
+          <div class="card-h">
+            <div>
+              <h2>최근 숙련도 평가</h2>
+              <p>세션별 분석·평가 현황</p>
+            </div>
+            <a class="linkish" href="analysis-result.html">전체 보기 →</a>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table" id="recent-table">
+              <thead>
+                <tr>
+                  <th>작업자명</th><th>작업명</th><th>작업유형</th><th>제품군</th><th>수행일</th><th>작업시간</th><th>숙련도</th><th>분석상태</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+  <script src="data.js"></script>
+  <script src="shared.js"></script>
+  <script>
+    mountShell("dash");
+    const d = UR_DATA.dashboard;
+    const kpi = [
+      ["전체 작업자 수", d.workers],
+      ["분석 완료 영상", d.done_videos],
+      ["분석 대기 영상", d.queued_videos],
+      ["평균 숙련도 점수", d.avg_skill],
+      ["평균 작업시간", d.avg_duration],
+      ["작업 오류 발생 건수", d.error_count],
+    ];
+    document.getElementById("kpis").innerHTML = kpi.map(([k,v],i) =>
+      `<div class="kpi-card"><p class="k">${k}</p><p class="v${i===3?" brand":""}">${v}</p></div>`
+    ).join("");
+    document.querySelector("#recent-table tbody").innerHTML = d.recent.map(r => {
+      const st = r.status === "분석완료" ? "ok" : "warn";
+      return `<tr>
+        <td class="name">${r.worker}</td>
+        <td>${r.task}</td>
+        <td><span class="tag-asm">${UR_DATA.taskTypeLabel(r.type)}</span></td>
+        <td>${UR_DATA.productCategoryLabel(r.product_category)}</td>
+        <td>${r.date}</td>
+        <td>${r.duration}</td>
+        <td>${r.score === "—" ? "—" : `<span style="color:var(--brand);font-weight:700;">${r.score}</span>점`}</td>
+        <td><span class="pill ${st}">${r.status === "분석완료" ? "분석 완료" : r.status === "분석대기" ? "분석 대기" : r.status}</span></td>
+      </tr>`;
+    }).join("");
+  </script>
+</body>
+</html>

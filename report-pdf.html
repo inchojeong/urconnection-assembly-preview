@@ -1,0 +1,122 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UR Connection · Skill Verification 보고서</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+  <link rel="stylesheet" href="shared-extra.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside class="rail">
+      <div class="rail-brand"><div class="mark">UR</div><div><p class="name">UR Connection</p><p class="ver">local preview</p></div></div>
+      <p class="rail-sec">WORKSPACE</p>
+      <nav class="rail-nav" data-shell-nav></nav>
+      <div class="rail-foot">
+        <div class="user-chip"><div class="avatar">AD</div><div><strong>관리자</strong><span>Administrator</span></div></div>
+        <button type="button" class="logout">로그아웃</button>
+        <p class="local-tag">LOCAL · github 미반영</p>
+      </div>
+    </aside>
+    <div class="content">
+      <header class="topbar">
+        <div>
+          <h1>숙련도 평가 보고서</h1>
+          <p class="meta">숙련도 평가 결과 확인 및 보고서 출력</p>
+        </div>
+        <div class="top-actions">
+          <a class="btn" href="evaluation-detail.html">평가 결과 보기</a>
+          <button type="button" class="btn primary" id="btn-pdf">PDF 보고서 저장</button>
+        </div>
+      </header>
+      <main class="main">
+        <div class="report-layout">
+          <article class="report-sheet" id="report">
+            <p class="crumb">숙련도 평가 · 분석 결과 및 평가 근거 보고서</p>
+            <div style="display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;">
+              <div>
+                <h1>숙련도 평가 결과 보고서</h1>
+                <p class="sub" id="r-meta"></p>
+              </div>
+              <span class="badge warn" id="status-badge">최종 평가 대기</span>
+            </div>
+
+            <div class="sv-hero" data-block="hero">
+              <div class="sv-metric">
+                <p class="k">AI 분석 점수</p>
+                <p class="v brand" id="r-skill"></p>
+                <p class="hint">분석 항목별 가중치 반영 · 참고 지표</p>
+              </div>
+              <div class="sv-metric">
+                <p class="k">AI 분석 등급</p>
+                <p class="v" id="r-grade"></p>
+                <p class="hint">숙련자 기준 데이터 대비</p>
+              </div>
+              <div class="sv-metric">
+                <p class="k">순서 정합률</p>
+                <p class="v" id="r-seq"></p>
+                <p class="hint">sequence conformity</p>
+              </div>
+              <div class="sv-metric">
+                <p class="k">NCS 평가 점수</p>
+                <p class="v" id="r-ncs">3.8/5</p>
+                <p class="hint">환산 76 · 고급 제안</p>
+              </div>
+            </div>
+
+            <section class="sv-block">
+              <h2>1. 작업 개요</h2>
+              <div class="info-row" id="overview"></div>
+            </section>
+
+            <section class="sv-block">
+              <h2>2. 종합 숙련도 · 점수 구성</h2>
+              <p class="help" id="r-profile-hint" style="margin:0 0 0.55rem;"></p>
+              <div class="score-bars" id="r-scores"></div>
+            </section>
+
+            <section class="sv-block">
+              <h2>3. 작업 단계 분석</h2>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead><tr><th>단계</th><th>실제시간</th><th>기준시간</th><th>결과</th></tr></thead>
+                  <tbody id="r-stages"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="sv-block">
+              <h2>4. 작업 순서 분석</h2>
+              <p style="margin:0 0 0.35rem;font-size:0.75rem;color:var(--muted);">표준 순서</p>
+              <div class="seq-row" id="r-seq-std"></div>
+              <p style="margin:0.45rem 0 0.35rem;font-size:0.75rem;color:var(--muted);">실제 수행</p>
+              <div class="seq-row" id="r-seq-act"></div>
+              <p style="margin:0.65rem 0 0;font-size:0.82rem;" id="r-seq-note"></p>
+            </section>
+
+            <section class="sv-block">
+              <h2>5. 주요 감점 요인</h2>
+              <ul id="r-deducts" style="margin:0;padding-left:1.1rem;font-size:0.82rem;line-height:1.65;"></ul>
+            </section>
+
+            <section class="sv-block">
+              <h2>6. 개선 권고사항</h2>
+              <ul style="margin:0;padding-left:1.1rem;font-size:0.82rem;line-height:1.65;">
+                <li>3단계(내부 부품 분리) 기준시간 준수를 위한 풀러 사전 배치</li>
+                <li>부품 정렬 단계 반복 방지 — 정렬 체크리스트 1회 확인 후 진행</li>
+                <li>공구 재탐색 동선 최소화 (작업대 공구 위치 표준화)</li>
+                <li>표준 순서 4→3 역전 방지 교육</li>
+              </ul>
+            </section>
+          </article>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script src="data.js"></script>
+  <script src="shared.js"></script>
+  <script src="report-pdf.js"></script>
+</body>
+</html>

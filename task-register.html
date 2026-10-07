@@ -1,0 +1,175 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UR Connection · 평가 세션 등록</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+  <link rel="stylesheet" href="shared-extra.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside class="rail">
+      <div class="rail-brand"><div class="mark">UR</div><div><p class="name">UR Connection</p><p class="ver">local preview</p></div></div>
+      <p class="rail-sec">WORKSPACE</p>
+      <nav class="rail-nav" data-shell-nav></nav>
+      <div class="rail-foot">
+        <div class="user-chip"><div class="avatar">AD</div><div><strong>관리자</strong><span>Administrator</span></div></div>
+        <button type="button" class="logout">로그아웃</button>
+        <p class="local-tag">LOCAL · github 미반영</p>
+      </div>
+    </aside>
+    <div class="content">
+      <header class="topbar">
+        <div>
+          <h1>평가 세션 등록</h1>
+          <p class="meta">평가 세션별 영상·이미지 근거 자료 등록</p>
+        </div>
+        <div class="top-actions">
+          <a class="btn" href="task-models.html">작업 기준</a>
+          <button type="button" class="btn primary" id="btn-save">평가 세션 등록</button>
+        </div>
+      </header>
+      <main class="main">
+        <section class="card">
+          <div class="card-h">
+            <div>
+              <h2>평가 세션 정보</h2>
+              <p>작업유형 · 제품군은 마스터 선택 · 숙련도 산식 키로 사용</p>
+            </div>
+          </div>
+          <div class="card-b">
+            <div class="grid-2">
+              <label class="field"><span>작업명<span class="req">*</span></span>
+                <input id="task-name" value="감속기 분해·재조립 평가" />
+              </label>
+              <label class="field"><span>작업유형 (task_type)<span class="req">*</span></span>
+                <select id="task-type"></select>
+              </label>
+              <label class="field"><span>대상 제품군 (product_category)<span class="req">*</span></span>
+                <select id="product-cat"></select>
+              </label>
+              <label class="field"><span>세부 제품 / 모델 (product_model)</span>
+                <select id="product-model"></select>
+              </label>
+              <label class="field"><span>작업자<span class="req">*</span></span>
+                <select id="worker-sel"></select>
+              </label>
+              <label class="field"><span>시험 일자<span class="req">*</span></span>
+                <input type="date" id="shot-date" />
+              </label>
+            </div>
+
+            <div style="margin-top:0.85rem;">
+              <p class="field-label">대상 부품 (component_type) · 복수 선택</p>
+              <div id="comp-groups" class="comp-groups"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" id="profile-card">
+          <div class="card-h">
+            <div>
+              <h2>적용 평가기준</h2>
+              <p>task_type × product_category → evaluation_profile</p>
+            </div>
+            <span class="badge" id="profile-id"></span>
+          </div>
+          <div class="card-b">
+            <p class="profile-name" id="profile-name"></p>
+            <p class="help" id="profile-focus" style="margin:0.35rem 0 0.65rem;"></p>
+            <div class="weight-row" id="profile-weights"></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-h"><div><h2>평가 근거 자료</h2><p>미디어 첨부 · 기준 결과물 · 작업 결과물</p></div></div>
+          <div class="card-b">
+            <div class="media-row">
+              <div class="product-box" style="min-height:6rem;">↑ 영상 추가 · 정면 + 측면 촬영본을 함께 등록</div>
+              <div class="product-box" style="min-height:6rem;">＋ 결과물 사진 · 기준·후보·결함 사진 등 복수 첨부</div>
+            </div>
+            <div class="chip-list" style="margin:0.65rem 0;">
+              <span class="chip">기준 결과물 추가</span>
+              <span class="chip">작업 결과물 추가</span>
+              <span class="chip warn">참고 이미지 추가</span>
+            </div>
+            <div class="actions-bar">
+              <button type="button" class="btn" id="btn-save2">평가 세션 등록</button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+  <script src="data.js"></script>
+  <script src="shared.js"></script>
+  <script>
+    mountShell("register");
+    document.getElementById("shot-date").value = todayISO();
+    document.getElementById("worker-sel").innerHTML = UR_DATA.workers
+      .map(w => `<option value="${w.id}">${w.name} (${w.id})</option>`).join("");
+
+    const typeSel = document.getElementById("task-type");
+    const catSel = document.getElementById("product-cat");
+    const modelSel = document.getElementById("product-model");
+
+    typeSel.innerHTML = UR_DATA.taskTypes
+      .map(t => `<option value="${t.code}" ${t.code === "DISASSEMBLY_ASSEMBLY" ? "selected" : ""}>${t.label}</option>`)
+      .join("");
+    catSel.innerHTML = UR_DATA.productCategories
+      .map(c => `<option value="${c.code}" ${c.code === "GEARBOX" ? "selected" : ""}>${c.label}</option>`)
+      .join("");
+
+    function fillModels() {
+      const cat = catSel.value;
+      const models = UR_DATA.productModels[cat] || ["—"];
+      modelSel.innerHTML = models.map((m, i) =>
+        `<option ${i === 0 ? "selected" : ""}>${m}</option>`
+      ).join("") + `<option value="__custom">직접 입력…</option>`;
+    }
+
+    function renderComponents() {
+      const selected = new Set(["GEAR", "SHAFT", "BEARING", "COVER", "BOLT"]);
+      document.getElementById("comp-groups").innerHTML = UR_DATA.componentGroups.map(g => `
+        <div class="comp-group">
+          <p class="comp-group-t">${g.group}</p>
+          <div class="ms-chips">
+            ${g.items.map(it => `
+              <label class="ms-chip">
+                <input type="checkbox" value="${it.code}" ${selected.has(it.code) ? "checked" : ""} />
+                <span>${it.label}</span>
+              </label>
+            `).join("")}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function refreshProfile() {
+      const tt = typeSel.value;
+      const pc = catSel.value;
+      const profile = UR_DATA.resolveProfile(tt, pc);
+      const typeMeta = UR_DATA.taskTypes.find(t => t.code === tt);
+      document.getElementById("profile-id").textContent = profile.id;
+      document.getElementById("profile-name").textContent = profile.name;
+      document.getElementById("profile-focus").textContent =
+        `평가 중점: ${typeMeta ? typeMeta.focus : "—"} · 제품군: ${UR_DATA.productCategoryLabel(pc)}`;
+      document.getElementById("profile-weights").innerHTML = profile.weights.map(([k, v]) =>
+        `<div class="weight-chip"><strong>${k}</strong><span>${v}%</span></div>`
+      ).join("");
+    }
+
+    typeSel.onchange = refreshProfile;
+    catSel.onchange = () => { fillModels(); refreshProfile(); };
+    fillModels();
+    renderComponents();
+    refreshProfile();
+
+    const save = () => toast("세션을 등록했습니다. (로컬 미리보기)");
+    document.getElementById("btn-save").onclick = save;
+    document.getElementById("btn-save2").onclick = save;
+  </script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UR Connection · 숙련도 최종 평가</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+  <link rel="stylesheet" href="shared-extra.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside class="rail">
+      <div class="rail-brand">
+        <div class="mark">UR</div>
+        <div>
+          <p class="name">UR Connection</p>
+          <p class="ver">local preview</p>
+        </div>
+      </div>
+      <p class="rail-sec">WORKSPACE</p>
+      <nav class="rail-nav" data-shell-nav></nav>
+      <div class="rail-foot">
+        <div class="user-chip">
+          <div class="avatar">AD</div>
+          <div>
+            <strong>관리자</strong>
+            <span>Administrator</span>
+          </div>
+        </div>
+        <button type="button" class="logout">로그아웃</button>
+        <p class="local-tag">LOCAL · github 미반영</p>
+      </div>
+    </aside>
+
+    <div class="content">
+      <header class="topbar">
+        <div>
+          <h1>숙련도 최종 평가</h1>
+          <p class="meta">SV-2026-1002-001 · DO TIEN DUC · 분해조립 · 2026-10-02</p>
+        </div>
+        <div class="top-actions">
+          <a class="btn" href="analysis-result.html">Stage/Event 타임라인</a>
+          <a class="btn primary" href="report-pdf.html">PDF 출력</a>
+          <a class="btn" href="dashboard.html">목록</a>
+        </div>
+      </header>
+
+      <main class="main">
+        <section class="card">
+          <div class="card-h">
+            <div>
+              <h2>숙련도 평가 기준</h2>
+              <p>NCS 능력단위 기반 세션 전체 작업 수행 평가 · AI 점수·Stage/Event 기반 평가 근거 확인 · 전문가 최종 숙련도 확정</p>
+            </div>
+          </div>
+          <div class="kpi-row">
+            <div class="kpi">
+              <p class="k">평가 단위</p>
+              <p class="v">세션 1건 (S-004)</p>
+            </div>
+            <div class="kpi">
+              <p class="k">평가 기준</p>
+              <p class="v">감속기 A형 분해·조립</p>
+            </div>
+            <div class="kpi">
+              <p class="k">시험 시나리오</p>
+              <p class="v">분해·재조립 · 감속기·기어박스</p>
+            </div>
+            <div class="kpi">
+              <p class="k">AI 참고 점수</p>
+              <p class="v brand">82점 · 숙련 제안</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-h">
+            <div>
+              <h2>숙련도 평가 근거</h2>
+              <p>영상 · Stage/Event · 결과물</p>
+            </div>
+            <a class="linkish" href="analysis-result.html">분석 결과 보기 →</a>
+          </div>
+          <div class="card-b">
+            <div class="media-row">
+              <div class="video-ph">작업 영상<br />gearbox_duc_01.mp4<br />08:40</div>
+              <div class="thumb-row">
+                <div class="thumb">기준<br />결과물</div>
+                <div class="thumb">작업<br />결과물</div>
+                <div class="thumb">참고<br />이미지</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="eval-split">
+          <section class="card">
+            <div class="card-h">
+              <div>
+                <h2>NCS 항목별 평가</h2>
+                <p>1–5점 · 세션 종합</p>
+              </div>
+            </div>
+            <div class="card-b">
+              <div class="rubric-item">
+                <div class="top">
+                  <div>
+                    <span class="code">E1</span>
+                    <h3>작업 준비 및 도면 확인</h3>
+                    <p>표준절차·공구·부품 준비</p>
+                  </div>
+                  <input class="score-input" value="4" />
+                </div>
+                <textarea class="memo" placeholder="근거 메모">표준작업 V1.2 확인 · 공구 배치 양호</textarea>
+              </div>
+              <div class="rubric-item">
+                <div class="top">
+                  <div>
+                    <span class="code">E2</span>
+                    <h3>분해 단계 수행</h3>
+                    <p>볼트해제 · 커버·기어 분리</p>
+                  </div>
+                  <input class="score-input" value="3" />
+                </div>
+                <textarea class="memo" placeholder="근거 메모">3단계 지연 · 공구 재탐색 2회</textarea>
+              </div>
+              <div class="rubric-item">
+                <div class="top">
+                  <div>
+                    <span class="code">E3</span>
+                    <h3>조립 및 체결</h3>
+                    <p>기어·축 결합 · 커버 · 볼트 체결</p>
+                  </div>
+                  <input class="score-input" value="4" />
+                </div>
+                <textarea class="memo" placeholder="근거 메모">재조립 1회 · 체결 상태 양호</textarea>
+              </div>
+              <div class="rubric-item">
+                <div class="top">
+                  <div>
+                    <span class="code">E4</span>
+                    <h3>작동 확인 및 결과물 검사</h3>
+                    <p>조립 완성 상태 확인</p>
+                  </div>
+                  <input class="score-input" value="4" />
+                </div>
+                <textarea class="memo" placeholder="근거 메모">완성 상태 합격</textarea>
+              </div>
+              <div class="rubric-item">
+                <div class="top">
+                  <div>
+                    <span class="code">E5</span>
+                    <h3>안전규정 준수 및 마무리</h3>
+                    <p>정리·안전 수칙</p>
+                  </div>
+                  <input class="score-input" value="4" />
+                </div>
+                <textarea class="memo" placeholder="근거 메모">안전 준수</textarea>
+              </div>
+            </div>
+          </section>
+
+          <aside class="card sticky-card">
+            <div class="card-h">
+              <div>
+                <h2>최종 숙련도 평가</h2>
+                <p>AI는 참고 · 전문가가 최종</p>
+              </div>
+            </div>
+            <div class="card-b">
+              <p class="k" style="margin:0;font-size:0.7rem;color:var(--muted);">NCS 평가 평균</p>
+              <p class="big-score">3.8<span>/5</span></p>
+              <label class="field">
+                <span>숙련도 등급</span>
+                <select>
+                  <option>초급</option>
+                  <option>중급</option>
+                  <option selected>고급</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>전문가 평가 의견</span>
+                <textarea rows="4">순서 정합은 양호하나 3단계 지연·공구 재탐색으로 시간·효율이 낮아졌습니다. 정렬 반복을 줄이면 즉시 투입 가능 수준입니다.</textarea>
+              </label>
+              <div class="actions-bar">
+                <button type="button" class="btn primary" onclick="toast('최종 숙련도를 확정했습니다. (로컬 미리보기)')">최종 숙련도 확정</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script src="data.js"></script>
+  <script src="shared.js"></script>
+  <script>mountShell("eval");</script>
+</body>
+</html>

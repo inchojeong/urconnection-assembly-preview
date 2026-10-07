@@ -1,0 +1,210 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UR Connection · 작업 기준</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+  <link rel="stylesheet" href="shared-extra.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside class="rail">
+      <div class="rail-brand"><div class="mark">UR</div><div><p class="name">UR Connection</p><p class="ver">local preview</p></div></div>
+      <p class="rail-sec">WORKSPACE</p>
+      <nav class="rail-nav" data-shell-nav></nav>
+      <div class="rail-foot">
+        <div class="user-chip"><div class="avatar">AD</div><div><strong>관리자</strong><span>Administrator</span></div></div>
+        <button type="button" class="logout">로그아웃</button>
+        <p class="local-tag">LOCAL · github 미반영</p>
+      </div>
+    </aside>
+    <div class="content">
+      <header class="topbar">
+        <div>
+          <h1>작업 기준 · 작업 모델</h1>
+          <p class="meta">operation_type(고정) + stage_name(제품별 등록) · Timeline 라벨 사전 정의</p>
+        </div>
+        <div class="top-actions">
+          <a class="btn" href="labeling-timeline.html">라벨링 툴</a>
+          <a class="btn primary" href="task-register.html">이 기준으로 등록</a>
+        </div>
+      </header>
+      <main class="main">
+        <section class="card">
+          <div class="card-h">
+            <div>
+              <h2 id="tm-name">작업 모델</h2>
+              <p id="tm-meta"></p>
+            </div>
+            <span class="badge" id="tm-type"></span>
+          </div>
+          <div class="card-b">
+            <div class="info-row" id="tm-info"></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-h">
+            <div>
+              <h2>적용 평가기준</h2>
+              <p id="ep-meta"></p>
+            </div>
+            <span class="badge" id="ep-id"></span>
+          </div>
+          <div class="card-b">
+            <div class="weight-row" id="ep-weights"></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-h">
+            <div>
+              <h2>표준 작업 단계 (Timeline 라벨 목록)</h2>
+              <p>라벨링 시 이 목록에서 선택 · 표시는 세부 작업명, 내부는 operation_type</p>
+            </div>
+            <button type="button" class="btn" id="btn-add-stage">+ 새 세부 작업 추가</button>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>순번</th>
+                  <th>작업 카테고리<br /><span class="id">operation_type · 고정</span></th>
+                  <th>세부 작업명<br /><span class="id">stage_name · 이 작업 기준 전용</span></th>
+                  <th>대상</th>
+                  <th>도구</th>
+                  <th>기준시간</th>
+                </tr>
+              </thead>
+              <tbody id="stages"></tbody>
+            </table>
+          </div>
+          <div class="card-b" id="add-panel" hidden>
+            <p class="help" style="margin:0 0 0.65rem;">
+              신규 항목은 <strong>현재 작업 기준에만</strong> 추가됩니다. 시스템 공통값으로 승격하려면 관리자 검토가 필요합니다.
+              세부 작업명은 반드시 기존 operation_type 중 하나에 매핑합니다.
+            </p>
+            <div class="grid-2">
+              <label class="field"><span>작업 카테고리 (고정)<span class="req">*</span></span>
+                <select id="new-op"></select>
+              </label>
+              <label class="field"><span>세부 작업명<span class="req">*</span></span>
+                <input id="new-name" placeholder="예: 오일 씰 분리" />
+              </label>
+            </div>
+            <div class="actions-bar">
+              <button type="button" class="btn" id="btn-cancel-add">취소</button>
+              <button type="button" class="btn primary" id="btn-confirm-add">이 작업 기준에 추가</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-h"><div><h2>작업 카테고리 마스터 (operation_type)</h2><p>시스템 고정 · 사용자 임의 추가 불가 · 숙련도 통계 집계 키</p></div></div>
+          <div class="card-b">
+            <div class="op-grid" id="ops"></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-h"><div><h2>평가 이벤트 타입 (evaluation_event)</h2><p>Stage와 구분 · Timeline 마커</p></div></div>
+          <div class="card-b">
+            <div class="chip-list" id="ev-types"></div>
+          </div>
+        </section>
+
+        <div class="grid-2" style="margin-top:0.75rem;">
+          <section class="card">
+            <div class="card-h"><div><h2>대상 부품 (component_type)</h2></div></div>
+            <div class="card-b"><div class="chip-list" id="objs"></div></div>
+          </section>
+          <section class="card">
+            <div class="card-h"><div><h2>Tool[]</h2></div></div>
+            <div class="card-b"><div class="chip-list" id="tools"></div></div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script src="data.js"></script>
+  <script src="shared.js"></script>
+  <script>
+    mountShell("models");
+    const tm = UR_DATA.taskModel;
+    const profile = UR_DATA.resolveProfile(tm.task_type, tm.product_category);
+    const localStages = tm.stages.map(s => ({ ...s }));
+
+    document.getElementById("tm-name").textContent = tm.name;
+    document.getElementById("tm-meta").textContent =
+      `${tm.id} · ${UR_DATA.productCategoryLabel(tm.product_category)} · ${tm.product_model} · ${tm.version}`;
+    document.getElementById("tm-type").textContent = UR_DATA.taskTypeLabel(tm.task_type);
+    document.getElementById("tm-info").innerHTML = [
+      ["task_type", tm.task_type],
+      ["product_category", tm.product_category],
+      ["product_model", tm.product_model],
+      ["단계 수", localStages.length + "단계"],
+      ["예상 총시간", tm.expected_total_sec + "초"],
+    ].map(([k,v]) => `<div class="info-box"><p class="k">${k}</p><p class="v">${v}</p></div>`).join("");
+
+    document.getElementById("ep-id").textContent = profile.id;
+    document.getElementById("ep-meta").textContent = profile.name;
+    document.getElementById("ep-weights").innerHTML = profile.weights.map(([k,v]) =>
+      `<div class="weight-chip"><strong>${k}</strong><span>${v}%</span></div>`
+    ).join("");
+
+    function renderStages() {
+      document.getElementById("stages").innerHTML = localStages.map(s =>
+        `<tr>
+          <td>${s.sequence}</td>
+          <td><span class="tag-asm">${UR_DATA.operationLabel(s.operation_type)}</span><br /><span class="id">${s.operation_type}</span></td>
+          <td class="name">${s.stage_name}</td>
+          <td>${s.target}</td>
+          <td>${s.tool}</td>
+          <td>${s.expected_time}초</td>
+        </tr>`
+      ).join("");
+    }
+    renderStages();
+
+    document.getElementById("ops").innerHTML = UR_DATA.operationTypes.map(o =>
+      `<div class="op-item"><strong>${o.label}</strong><span class="id">${o.code}</span><p>${o.example}</p></div>`
+    ).join("");
+
+    document.getElementById("ev-types").innerHTML = UR_DATA.eventTypes
+      .map(e => `<span class="chip warn">${e.label} · ${e.code}</span>`).join("");
+
+    const compLabels = {};
+    UR_DATA.componentGroups.forEach(g => g.items.forEach(it => { compLabels[it.code] = it.label; }));
+    document.getElementById("objs").innerHTML = tm.components
+      .map(c => `<span class="chip">${compLabels[c] || c}</span>`).join("");
+    document.getElementById("tools").innerHTML = tm.tools.map(t => `<span class="chip">${t}</span>`).join("");
+
+    document.getElementById("new-op").innerHTML = UR_DATA.operationTypes
+      .map(o => `<option value="${o.code}">${o.label} (${o.code})</option>`).join("");
+
+    const panel = document.getElementById("add-panel");
+    document.getElementById("btn-add-stage").onclick = () => { panel.hidden = false; };
+    document.getElementById("btn-cancel-add").onclick = () => { panel.hidden = true; };
+    document.getElementById("btn-confirm-add").onclick = () => {
+      const op = document.getElementById("new-op").value;
+      const name = document.getElementById("new-name").value.trim();
+      if (!name) { toast("세부 작업명을 입력하세요."); return; }
+      localStages.push({
+        stage_id: "S" + (localStages.length + 1),
+        sequence: localStages.length + 1,
+        stage_name: name,
+        operation_type: op,
+        target: "—",
+        tool: "—",
+        expected_time: 30,
+      });
+      renderStages();
+      panel.hidden = true;
+      document.getElementById("new-name").value = "";
+      toast(`「${name}」을(를) 이 작업 기준에만 추가했습니다.`);
+    };
+  </script>
+</body>
+</html>

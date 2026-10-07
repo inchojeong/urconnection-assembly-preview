@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UR Connection · 작업자 상세</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+  <link rel="stylesheet" href="shared-extra.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside class="rail">
+      <div class="rail-brand"><div class="mark">UR</div><div><p class="name">UR Connection</p><p class="ver">local preview</p></div></div>
+      <p class="rail-sec">WORKSPACE</p>
+      <nav class="rail-nav" data-shell-nav></nav>
+      <div class="rail-foot">
+        <div class="user-chip"><div class="avatar">AD</div><div><strong>관리자</strong><span>Administrator</span></div></div>
+        <button type="button" class="logout">로그아웃</button>
+      </div>
+    </aside>
+    <div class="content">
+      <header class="topbar">
+        <div>
+          <h1 id="w-name">작업자 상세</h1>
+          <p class="meta" id="w-meta"></p>
+        </div>
+        <div class="top-actions">
+          <a class="btn" href="workers-list.html">목록</a>
+          <a class="btn primary" href="analysis-result.html">분석 결과</a>
+        </div>
+      </header>
+      <main class="main">
+        <div class="info-row" id="profile"></div>
+        <section class="card" style="margin-top:0.75rem;">
+          <div class="card-h">
+            <div>
+              <h2>숙련도 평가 이력</h2>
+              <p>최근 수행 작업</p>
+            </div>
+          </div>
+          <div class="card-b">
+            <div class="match-card">
+              <p class="title" id="rt-title"></p>
+              <p class="body" id="rt-body"></p>
+            </div>
+            <div class="info-row" style="margin-top:0.75rem;" id="rt-kpis"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+  <script src="data.js"></script>
+  <script src="shared.js"></script>
+  <script>
+    mountShell("workers");
+    const w = UR_DATA.workerDetail;
+    document.getElementById("w-name").textContent = w.name;
+    document.getElementById("w-meta").textContent = `${w.id} · ${w.job} · ${w.org}`;
+    document.getElementById("profile").innerHTML = [
+      ["작업자 ID", w.id], ["소속", w.org], ["직종/직무", w.job], ["평균 숙련도", w.assembly_skill + "점"],
+    ].map(([k,v]) => `<div class="info-box"><p class="k">${k}</p><p class="v">${v}</p></div>`).join("");
+    document.getElementById("rt-title").textContent = w.recent_task;
+    document.getElementById("rt-body").textContent = `조립 숙련도 ${w.assembly_skill}점 · 표준 작업시간 대비 ${w.time_vs_standard}`;
+    document.getElementById("rt-kpis").innerHTML = [
+      ["조립 숙련도", w.assembly_skill + "점"],
+      ["표준시간 대비", w.time_vs_standard],
+      ["순서 오류", w.sequence_errors + "건"],
+      ["재작업", w.rework + "회"],
+    ].map(([k,v],i) => `<div class="info-box${i===0?" accent":""}"><p class="k">${k}</p><p class="v">${v}</p></div>`).join("");
+  </script>
+</body>
+</html>

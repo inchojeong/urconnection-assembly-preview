@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UR Connection · Stage/Event 라벨링</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+  <link rel="stylesheet" href="shared-extra.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside class="rail">
+      <div class="rail-brand"><div class="mark">UR</div><div><p class="name">UR Connection</p><p class="ver">local preview</p></div></div>
+      <p class="rail-sec">WORKSPACE</p>
+      <nav class="rail-nav" data-shell-nav></nav>
+      <div class="rail-foot">
+        <div class="user-chip"><div class="avatar">AD</div><div><strong>관리자</strong><span>Administrator</span></div></div>
+        <button type="button" class="logout">로그아웃</button>
+        <p class="local-tag">LOCAL · github 미반영</p>
+      </div>
+    </aside>
+    <div class="content">
+      <header class="topbar">
+        <div>
+          <h1>Stage/Event 라벨링</h1>
+          <p class="meta" id="session-meta">S-004 · gearbox_duc_01.mp4 · 감속기 A형 분해·재조립 V1</p>
+        </div>
+        <div class="top-actions">
+          <a class="btn" href="task-models.html">작업 기준</a>
+          <a class="btn" href="analysis-result.html">분석 결과</a>
+          <button type="button" class="btn primary" id="btn-save">라벨 구간 저장</button>
+        </div>
+      </header>
+
+      <main class="main label-main">
+        <div class="label-workspace">
+          <!-- 영상 + 타임라인 -->
+          <section class="card label-player">
+            <div class="card-h">
+              <div>
+                <h2>작업 영상</h2>
+                <p>구간 선택 후 우측에서 Stage 또는 Event 라벨을 지정합니다</p>
+              </div>
+              <div class="play-btns">
+                <button type="button" class="btn" id="btn-back5">−5s</button>
+                <button type="button" class="btn primary" id="btn-play">▶</button>
+                <button type="button" class="btn" id="btn-fwd5">+5s</button>
+              </div>
+            </div>
+            <div class="card-b">
+              <div class="video-stage" id="video-stage">
+                <div class="video-ph label-video">
+                  작업 영상 · gearbox_duc_01.mp4<br />
+                  <span id="clock">00:00 / 06:00</span>
+                </div>
+              </div>
+
+              <div class="scrub" id="scrub">
+                <div class="scrub-track" id="scrub-track">
+                  <div class="scrub-range" id="scrub-range" hidden></div>
+                  <div class="scrub-playhead" id="playhead"></div>
+                  <div class="scrub-stages" id="scrub-stages"></div>
+                  <div class="scrub-events" id="scrub-events"></div>
+                </div>
+                <div class="scrub-times">
+                  <span>00:00</span>
+                  <span id="sel-range-label">선택 구간: —</span>
+                  <span>06:00</span>
+                </div>
+              </div>
+
+              <div class="range-inputs">
+                <label class="field"><span>시작(초)</span><input type="number" id="t-start" min="0" max="360" step="1" value="36" /></label>
+                <label class="field"><span>종료(초)</span><input type="number" id="t-end" min="0" max="360" step="1" value="52" /></label>
+                <button type="button" class="btn" id="btn-set-range">선택 구간 적용</button>
+                <button type="button" class="btn" id="btn-clear-range">선택 해제</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- 라벨 팔레트 -->
+          <aside class="card label-side">
+            <div class="card-h">
+              <div>
+                <h2>라벨</h2>
+                <p>Stage / Event</p>
+              </div>
+            </div>
+            <div class="card-b">
+              <div class="tabs" id="mode-tabs">
+                <a href="#" class="tab active" data-mode="stage">Stage</a>
+                <a href="#" class="tab" data-mode="event">Event</a>
+              </div>
+
+              <div id="panel-stage">
+                <p class="field-label">작업 기준 세부 작업명 · 선택</p>
+                <div class="stage-pick" id="stage-pick"></div>
+                <button type="button" class="btn" id="btn-new-stage" style="width:100%;margin-top:0.55rem;">+ 새 세부 작업 추가</button>
+                <div id="new-stage-box" class="new-stage-box" hidden>
+                  <label class="field"><span>작업 카테고리 (고정)<span class="req">*</span></span>
+                    <select id="new-op"></select>
+                  </label>
+                  <label class="field"><span>세부 작업명<span class="req">*</span></span>
+                    <input id="new-name" placeholder="예: 오일 씰 분리" />
+                  </label>
+                  <p class="help">현재 작업 기준에만 추가됩니다.</p>
+                  <div class="actions-bar">
+                    <button type="button" class="btn" id="btn-cancel-new">취소</button>
+                    <button type="button" class="btn primary" id="btn-add-new">추가</button>
+                  </div>
+                </div>
+                <button type="button" class="btn primary" id="btn-apply-stage" style="width:100%;margin-top:0.65rem;">선택 구간에 Stage 적용</button>
+              </div>
+
+              <div id="panel-event" hidden>
+                <p class="field-label">평가 이벤트 · 선택</p>
+                <div class="event-pick" id="event-pick"></div>
+                <button type="button" class="btn primary" id="btn-apply-event" style="width:100%;margin-top:0.65rem;">선택 구간에 Event 적용</button>
+              </div>
+
+              <div class="prop-box" id="prop-box">
+                <h3>Stage/Event 정보</h3>
+                <p class="help" style="margin:0;">구간을 선택하고 라벨을 지정하세요.</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        <!-- 라벨 결과 목록 -->
+        <div class="grid-2" style="margin-top:0.75rem;">
+          <section class="card">
+            <div class="card-h">
+              <div>
+                <h2>STAGE <span class="id" id="stage-count">(0)</span></h2>
+                <p>세부 작업명 · operation_type</p>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead><tr><th>#</th><th>세부 작업명</th><th>카테고리</th><th>구간</th><th></th></tr></thead>
+                <tbody id="labeled-stages"></tbody>
+              </table>
+            </div>
+          </section>
+          <section class="card">
+            <div class="card-h">
+              <div>
+                <h2>EVENT <span class="id" id="event-count">(0)</span></h2>
+                <p>이상행동 · 오류 마커</p>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead><tr><th>이벤트</th><th>코드</th><th>구간</th><th></th></tr></thead>
+                <tbody id="labeled-events"></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script src="data.js"></script>
+  <script src="shared.js"></script>
+  <script src="labeling-timeline.js"></script>
+</body>
+</html>
