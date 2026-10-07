@@ -24,7 +24,7 @@
       <header class="topbar">
         <div>
           <h1>평가 세션 등록</h1>
-          <p class="meta">평가 세션별 영상·이미지 근거 자료 등록</p>
+          <p class="meta">영상·기술자 매칭 → 작업유형·제품군 지정 → TaskModel·NCS 기준 호출</p>
         </div>
         <div class="top-actions">
           <a class="btn" href="task-models.html">작업 기준</a>
@@ -35,14 +35,31 @@
         <section class="card">
           <div class="card-h">
             <div>
-              <h2>평가 세션 정보</h2>
-              <p>작업유형 · 제품군은 마스터 선택 · 숙련도 산식 키로 사용</p>
+              <h2>이 기술자의 Skill History</h2>
+              <p id="hist-worker">DO TIEN DUC</p>
             </div>
+            <span class="badge" id="hist-n">3회</span>
+          </div>
+          <div class="card-b">
+            <div class="hist-list" id="hist-list"></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-h">
+            <div>
+              <h2>평가 세션 정보</h2>
+              <p>영상·기술자 매칭 · 작업유형·제품군 → TaskModel·NCS 호출</p>
+            </div>
+            <span class="badge">예상 SV-2026-1007-001</span>
           </div>
           <div class="card-b">
             <div class="grid-2">
-              <label class="field"><span>작업명<span class="req">*</span></span>
+              <label class="field"><span>작업명 / 영상 제목<span class="req">*</span></span>
                 <input id="task-name" value="감속기 분해·재조립 평가" />
+              </label>
+              <label class="field"><span>기술자<span class="req">*</span></span>
+                <select id="worker-sel"></select>
               </label>
               <label class="field"><span>작업유형 (task_type)<span class="req">*</span></span>
                 <select id="task-type"></select>
@@ -53,11 +70,14 @@
               <label class="field"><span>세부 제품 / 모델 (product_model)</span>
                 <select id="product-model"></select>
               </label>
-              <label class="field"><span>작업자<span class="req">*</span></span>
-                <select id="worker-sel"></select>
-              </label>
               <label class="field"><span>시험 일자<span class="req">*</span></span>
                 <input type="date" id="shot-date" />
+              </label>
+              <label class="field"><span>등록번호</span>
+                <input value="자동 부여" readonly />
+              </label>
+              <label class="field"><span>시나리오</span>
+                <input value="감속기 A형 표준작업 V1 · TaskModel 연동" readonly />
               </label>
             </div>
 
@@ -87,14 +107,15 @@
           <div class="card-h"><div><h2>평가 근거 자료</h2><p>미디어 첨부 · 기준 결과물 · 작업 결과물</p></div></div>
           <div class="card-b">
             <div class="media-row">
-              <div class="product-box" style="min-height:6rem;">↑ 영상 추가 · 정면 + 측면 촬영본을 함께 등록</div>
-              <div class="product-box" style="min-height:6rem;">＋ 결과물 사진 · 기준·후보·결함 사진 등 복수 첨부</div>
+              <div class="product-box" style="min-height:6rem;">↑ 정면 영상 추가<br />gearbox_test_001.mp4</div>
+              <div class="product-box" style="min-height:6rem;">↑ 측면 영상 추가<br />정면 + 측면 촬영본을 함께 등록</div>
             </div>
             <div class="chip-list" style="margin:0.65rem 0;">
               <span class="chip">기준 결과물 추가</span>
               <span class="chip">작업 결과물 추가</span>
               <span class="chip warn">참고 이미지 추가</span>
             </div>
+            <p class="help">이 단계에서는 숙련도를 산출하지 않습니다. 원천 영상·기술자 매칭·평가 기준만 확정합니다.</p>
             <div class="actions-bar">
               <button type="button" class="btn" id="btn-save2">평가 세션 등록</button>
             </div>
@@ -110,6 +131,32 @@
     document.getElementById("shot-date").value = todayISO();
     document.getElementById("worker-sel").innerHTML = UR_DATA.workers
       .map(w => `<option value="${w.id}">${w.name} (${w.id})</option>`).join("");
+
+    const skillHistory = {
+      "W-001": [
+        { sv: "SV-2026-1002-001", task: "감속기 분해·재조립", score: "4.4", date: "2026-10-02", media: "영상 2 · 사진 3" },
+        { sv: "SV-2026-0915-001", task: "모터 조립", score: "4.1", date: "2026-09-15", media: "영상 1 · 사진 2" },
+        { sv: "SV-2026-0820-001", task: "펌프 부품교체", score: "3.9", date: "2026-08-20", media: "영상 1 · 사진 1" },
+      ],
+    };
+    function renderHist() {
+      const id = document.getElementById("worker-sel").value;
+      const w = UR_DATA.workers.find(x => x.id === id);
+      const list = skillHistory[id] || [];
+      document.getElementById("hist-worker").textContent = w ? w.name : id;
+      document.getElementById("hist-n").textContent = list.length + "회";
+      document.getElementById("hist-list").innerHTML = list.length
+        ? list.map(h => `
+          <div class="hist-item">
+            <strong>${h.sv}</strong>
+            <span>${h.task}</span>
+            <span class="id">${h.date} · ${h.media}</span>
+            <span class="score">${h.score}</span>
+          </div>`).join("")
+        : `<p class="help" style="margin:0;">이 기술자의 평가 이력이 없습니다. 등록 후 Skill History가 쌓입니다.</p>`;
+    }
+    document.getElementById("worker-sel").onchange = renderHist;
+    renderHist();
 
     const typeSel = document.getElementById("task-type");
     const catSel = document.getElementById("product-cat");

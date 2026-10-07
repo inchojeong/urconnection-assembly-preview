@@ -4,82 +4,55 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>UR Connection · 데모 화면</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="shared.css" />
   <style>
-    .hub { max-width: 40rem; margin: 3rem auto; padding: 0 1rem; }
-    .hub h1 { margin: 0 0 0.4rem; font-size: 1.35rem; }
-    .hub p { margin: 0 0 1.25rem; color: var(--muted); font-size: 0.88rem; line-height: 1.5; }
+    .hub { max-width: 42rem; margin: 2.5rem auto; padding: 0 1rem; }
+    .hub h1 { margin: 0 0 0.35rem; font-size: 1.35rem; }
+    .hub > p { margin: 0 0 1.1rem; color: var(--muted); font-size: 0.88rem; line-height: 1.5; }
+    .flow {
+      display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0 0 1.25rem;
+      font-size: 0.72rem; color: var(--muted);
+    }
+    .flow span {
+      padding: 0.25rem 0.45rem; border: 1px solid var(--line);
+      border-radius: 0.3rem; background: #fff;
+    }
     .hub a.card-link {
-      display: block;
-      padding: 0.9rem 1rem;
-      border: 1px solid var(--line);
-      border-radius: 0.5rem;
-      background: #fff;
-      text-decoration: none;
-      color: inherit;
-      margin-bottom: 0.55rem;
+      display: block; padding: 0.9rem 1rem; border: 1px solid var(--line);
+      border-radius: 0.5rem; background: #fff; text-decoration: none;
+      color: inherit; margin-bottom: 0.55rem;
     }
     .hub a.card-link:hover { border-color: #c7dbff; background: var(--brand-soft); }
     .hub a.card-link strong { display: block; font-size: 0.9rem; margin-bottom: 0.2rem; }
     .hub a.card-link span { font-size: 0.75rem; color: var(--muted); }
-    .hub .sec { margin: 1.4rem 0 0.55rem; font-size: 0.72rem; font-weight: 650; color: var(--muted); letter-spacing: 0.04em; }
+    .hub .sec { margin: 1.25rem 0 0.5rem; font-size: 0.72rem; font-weight: 650; color: var(--muted); letter-spacing: 0.04em; }
   </style>
 </head>
 <body>
   <div class="hub">
-    <h1>유알커넥션 · 데모 화면</h1>
-    <p>S-004 셸 기준 로컬 미리보기입니다. 공통 UI 문구는 유지하고, 작업 데이터·Timeline은 분해·조립 기준으로 구성했습니다.</p>
+    <h1>유알커넥션 · 분해·조립 데모</h1>
+    <p>영상은 점수를 만들지 않습니다. Stage/Event로 근거를 구조화하고, NCS 평가로 숙련도를 확정합니다. UI 골격은 기존 데모(등록→라벨링→NCS)를 따릅니다.</p>
+    <div class="flow">
+      <span>1 영상</span><span>2 기술자 매칭</span><span>3 평가세션</span><span>4 TaskModel</span>
+      <span>5 Stage 라벨</span><span>6 Event</span><span>7 Feature</span><span>8 결과조회</span>
+      <span>9 NCS 평가</span><span>10 등급확정</span><span>11 리포트</span>
+    </div>
 
     <p class="sec">WORKSPACE</p>
-    <a class="card-link" href="dashboard.html">
-      <strong>대시보드</strong>
-      <span>숙련도 등급 분포 · 최근 숙련도 평가</span>
-    </a>
-    <a class="card-link" href="task-register.html">
-      <strong>평가 세션 등록</strong>
-      <span>task_type × product_category → 평가 프로파일 자동 표시</span>
-    </a>
-    <a class="card-link" href="task-models.html">
-      <strong>작업 기준 · 작업 모델</strong>
-      <span>operation_type · component_type · evaluation_profile</span>
-    </a>
-    <a class="card-link" href="labeling-timeline.html">
-      <strong>Stage/Event 라벨링</strong>
-      <span>영상 구간 선택 → 세부 작업명/Event 적용 · 라벨 구간 저장</span>
-    </a>
-    <a class="card-link" href="analysis-progress.html">
-      <strong>분석·평가 현황</strong>
-      <span>AI 분석 파이프라인</span>
-    </a>
-    <a class="card-link" href="analysis-result.html">
-      <strong>세션 종합 분석</strong>
-      <span>stage_name 표시 · operation_type 코드 · Event 마커</span>
-    </a>
-    <a class="card-link" href="evaluation-detail.html">
-      <strong>숙련도 최종 평가</strong>
-      <span>NCS 항목별 평가 · PDF 출력</span>
-    </a>
-    <a class="card-link" href="report-pdf.html">
-      <strong>Skill Verification 결과 PDF</strong>
-      <span>분석 결과 및 평가 근거 보고서</span>
-    </a>
+    <a class="card-link" href="dashboard.html"><strong>대시보드</strong><span>등급 분포 · AI·전문가 비교 · 최근 숙련도 평가</span></a>
+    <a class="card-link" href="task-register.html"><strong>등록 · 평가 세션</strong><span>영상·기술자 매칭 · task_type × 제품군 · TaskModel 호출</span></a>
+    <a class="card-link" href="task-models.html"><strong>작업 기준</strong><span>TaskModel · operation_type · stage_name · NCS 연결</span></a>
+    <a class="card-link" href="labeling-timeline.html"><strong>라벨링</strong><span>Timeline Stage/Event · 라벨 구간 저장</span></a>
+    <a class="card-link" href="analysis-result.html"><strong>라벨링 결과 조회</strong><span>진행·순서·반복·공구 · AI 참고 Feature</span></a>
+    <a class="card-link" href="evaluation-detail.html"><strong>NCS 숙련도 평가</strong><span>수행준거 1~5점 · 평균·등급 · 최종 확정</span></a>
+    <a class="card-link" href="analysis-progress.html"><strong>작업 현황</strong><span>세션 파이프라인 · NCS 평가 진입</span></a>
+    <a class="card-link" href="report-pdf.html"><strong>Skill Verification PDF</strong><span>기술자·Timeline·NCS·등급·개선사항</span></a>
 
-    <p class="sec">WORKERS</p>
-    <a class="card-link" href="workers-list.html">
-      <strong>작업자 목록 → 기술자 등록</strong>
-      <span>목록 우측 상단 「기술자 등록」</span>
-    </a>
-    <a class="card-link" href="worker-detail.html">
-      <strong>작업자 상세</strong>
-      <span>숙련도 평가 이력 · 최근 수행 작업</span>
-    </a>
-    <a class="card-link" href="workers-register.html">
-      <strong>기술자(작업자) 정보 등록</strong>
-      <span>이름 · 국적 · 직종 · 회사 등록 폼</span>
-    </a>
+    <p class="sec">TECHNICIANS</p>
+    <a class="card-link" href="workers-list.html"><strong>기술자 목록</strong><span>Skill History · 기술자 등록</span></a>
+    <a class="card-link" href="worker-detail.html"><strong>기술자 상세</strong><span>숙련도 평가 이력</span></a>
+    <a class="card-link" href="workers-register.html"><strong>기술자 등록</strong><span>이름 · 국적 · 직종 · 회사</span></a>
   </div>
 </body>
 </html>

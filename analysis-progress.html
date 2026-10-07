@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>UR Connection · 분석 진행</title>
+  <title>UR Connection · 분석·평가 현황</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="shared.css" />
   <link rel="stylesheet" href="shared-extra.css" />
@@ -17,45 +17,51 @@
       <div class="rail-foot">
         <div class="user-chip"><div class="avatar">AD</div><div><strong>관리자</strong><span>Administrator</span></div></div>
         <button type="button" class="logout">로그아웃</button>
+        <p class="local-tag">LOCAL · github 미반영</p>
       </div>
     </aside>
     <div class="content">
       <header class="topbar">
         <div>
           <h1>분석·평가 현황</h1>
-          <p class="meta">AI 분석 중 · 대기 · 완료 · 실패</p>
+          <p class="meta">평가 세션 · 진행·NCS 검토 · 실패 재처리</p>
         </div>
         <div class="top-actions">
-          <a class="btn primary" href="analysis-result.html">상세</a>
+          <a class="btn primary" href="task-register.html">영상 업로드</a>
         </div>
       </header>
       <main class="main">
+        <div class="tabs" id="tabs">
+          <button type="button" class="tab active" data-tab="all">전체 세션</button>
+          <button type="button" class="tab" data-tab="ncs">진행·NCS 검토</button>
+          <button type="button" class="tab" data-tab="fail">실패</button>
+        </div>
+
         <section class="card">
-          <div class="card-h">
-            <div>
-              <h2>분석 파이프라인</h2>
-              <p>감속기 A형 분해·조립 · gearbox_lee_01.mp4</p>
-            </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>등록번호</th>
+                  <th>기술자 · 작업</th>
+                  <th>일자</th>
+                  <th>미디어</th>
+                  <th>파이프라인</th>
+                  <th>NCS</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="rows"></tbody>
+            </table>
+          </div>
+          <p class="help" id="total-n" style="padding:0.65rem 1rem;"></p>
+        </section>
+
+        <section class="card" style="margin-top:0.75rem;">
+          <div class="card-h"><div><h2>분석 파이프라인 (선택 세션)</h2><p>영상 → Feature 추출 · NCS 근거 준비 · AI는 참고</p></div>
             <span class="badge warn">진행 중</span>
           </div>
-          <div class="card-b">
-            <div class="pipe" id="pipe"></div>
-          </div>
-        </section>
-        <section class="card">
-          <div class="card-h"><div><h2>분석 항목</h2><p>분해·조립 기준으로 추적하는 신호</p></div></div>
-          <div class="card-b">
-            <div class="info-row">
-              <div class="info-box"><p class="k">작업자 인식</p><p class="v">진행</p></div>
-              <div class="info-box"><p class="k">손/관절 추적</p><p class="v">진행</p></div>
-              <div class="info-box"><p class="k">작업 대상 객체</p><p class="v">진행</p></div>
-              <div class="info-box"><p class="k">공구 인식</p><p class="v">진행</p></div>
-              <div class="info-box"><p class="k">작업단계 인식</p><p class="v">대기</p></div>
-              <div class="info-box"><p class="k">작업 순서 분석</p><p class="v">대기</p></div>
-              <div class="info-box"><p class="k">단계별 소요시간</p><p class="v">대기</p></div>
-              <div class="info-box"><p class="k">반복/재작업</p><p class="v">대기</p></div>
-            </div>
-          </div>
+          <div class="card-b"><div class="pipe" id="pipe"></div></div>
         </section>
       </main>
     </div>
@@ -64,6 +70,50 @@
   <script src="shared.js"></script>
   <script>
     mountShell("progress");
+
+    function pipeHtml(s) {
+      if (s.pipeline_pct >= 100) {
+        return `<span class="pill ok">분석 완료</span>`;
+      }
+      return `<div class="pipe-mini"><span>${s.pipeline}</span><div class="pipe-bar"><i style="width:${s.pipeline_pct}%"></i></div></div>`;
+    }
+
+    function render(filter) {
+      let list = UR_DATA.sessions;
+      if (filter === "ncs") {
+        list = list.filter(s => s.score === "—" || s.pipeline.includes("NCS") || s.pipeline_pct < 100);
+      } else if (filter === "fail") {
+        list = list.filter(s => s.pipeline.includes("실패"));
+      }
+      document.getElementById("rows").innerHTML = list.map(s => {
+        const acts = [];
+        if (s.pipeline_pct >= 100) {
+          acts.push(`<a class="btn sm" href="evaluation-detail.html">NCS 평가</a>`);
+        }
+        acts.push(`<a class="btn sm ghost" href="analysis-result.html">대표 분석</a>`);
+        return `<tr>
+          <td><span class="name">${s.sv}</span><span class="id">${s.sid}</span></td>
+          <td>${s.worker}<br /><span class="id">${s.task}</span>
+            <br /><span class="tag-asm">${UR_DATA.taskTypeLabel(s.type)}</span></td>
+          <td>${s.date}</td>
+          <td>${s.media}</td>
+          <td>${pipeHtml(s)}</td>
+          <td>${s.score === "—" ? "—" : `<strong style="color:var(--brand)">${s.score}</strong>`}</td>
+          <td class="acts">${acts.join(" ")}</td>
+        </tr>`;
+      }).join("") || `<tr><td colspan="7" style="text-align:center;color:var(--muted);">해당 세션이 없습니다.</td></tr>`;
+      document.getElementById("total-n").textContent = `총 ${list.length}개`;
+    }
+
+    document.getElementById("tabs").onclick = (e) => {
+      const btn = e.target.closest(".tab");
+      if (!btn) return;
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      btn.classList.add("active");
+      render(btn.dataset.tab);
+    };
+    render("all");
+
     document.getElementById("pipe").innerHTML = UR_DATA.analysis.progress_steps.map(s => {
       const cls = s.done ? "done" : (s.current ? "current" : "");
       const st = s.done ? "완료" : (s.current ? "진행 중" : "대기");

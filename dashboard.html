@@ -17,38 +17,65 @@
       <div class="rail-foot">
         <div class="user-chip"><div class="avatar">AD</div><div><strong>관리자</strong><span>Administrator</span></div></div>
         <button type="button" class="logout">로그아웃</button>
+        <p class="local-tag">LOCAL · github 미반영</p>
       </div>
     </aside>
     <div class="content">
       <header class="topbar">
         <div>
           <h1>대시보드</h1>
-          <p class="meta">숙련도 등급 분포 · AI·전문가 평가 비교 · 최근 숙련도 평가</p>
+          <p class="meta">평가 세션 기준 · 등록 → 라벨링 → NCS</p>
         </div>
         <div class="top-actions">
-          <a class="btn" href="task-register.html">평가 세션 등록</a>
-          <a class="btn primary" href="analysis-result.html">숙련도 평가</a>
+          <a class="btn" href="task-register.html">+ 등록</a>
+          <a class="btn" href="labeling-timeline.html">라벨링</a>
+          <a class="btn primary" href="evaluation-detail.html">숙련도 평가</a>
         </div>
       </header>
       <main class="main">
-        <div class="kpi-grid" id="kpis"></div>
+        <nav class="ops-strip" id="ops" aria-label="운영 요약"></nav>
+
+        <div class="grid-2">
+          <section class="card">
+            <div class="card-h"><div><h2>숙련도 등급 분포</h2><p>완료된 기술자 숙련도 등급</p></div></div>
+            <div class="card-b">
+              <div class="grade-dist" id="grade-dist"></div>
+            </div>
+          </section>
+          <section class="card">
+            <div class="card-h"><div><h2>AI·전문가 평가 비교</h2><p>AI 참고 점수와 전문가(NCS) 평가 비교</p></div></div>
+            <div class="card-b">
+              <div class="compare-list" id="compare"></div>
+            </div>
+          </section>
+        </div>
+
         <section class="card" style="margin-top:0.75rem;">
           <div class="card-h">
             <div>
               <h2>최근 숙련도 평가</h2>
-              <p>세션별 분석·평가 현황</p>
+              <p>새롭게 등록되거나 갱신된 세션</p>
             </div>
-            <a class="linkish" href="analysis-result.html">전체 보기 →</a>
+            <a class="linkish" href="analysis-progress.html">전체 보기 →</a>
           </div>
           <div class="table-wrap">
-            <table class="data-table" id="recent-table">
+            <table class="data-table">
               <thead>
                 <tr>
-                  <th>작업자명</th><th>작업명</th><th>작업유형</th><th>제품군</th><th>수행일</th><th>작업시간</th><th>숙련도</th><th>분석상태</th>
+                  <th>등록번호</th><th>기술자</th><th>작업</th><th>일자</th><th>미디어</th><th>결과</th>
                 </tr>
               </thead>
-              <tbody></tbody>
+              <tbody id="recent-body"></tbody>
             </table>
+          </div>
+        </section>
+
+        <section class="card" style="margin-top:0.75rem;">
+          <div class="card-h"><div><h2>검토 필요 세션</h2><p>확인이 필요한 세션</p></div>
+            <span class="badge warn" id="review-n"></span>
+          </div>
+          <div class="card-b">
+            <div class="review-list" id="review"></div>
           </div>
         </section>
       </main>
@@ -59,30 +86,46 @@
   <script>
     mountShell("dash");
     const d = UR_DATA.dashboard;
-    const kpi = [
-      ["전체 작업자 수", d.workers],
-      ["분석 완료 영상", d.done_videos],
-      ["분석 대기 영상", d.queued_videos],
-      ["평균 숙련도 점수", d.avg_skill],
-      ["평균 작업시간", d.avg_duration],
-      ["작업 오류 발생 건수", d.error_count],
-    ];
-    document.getElementById("kpis").innerHTML = kpi.map(([k,v],i) =>
-      `<div class="kpi-card"><p class="k">${k}</p><p class="v${i===3?" brand":""}">${v}</p></div>`
+    document.getElementById("ops").innerHTML = [
+      ["세션", d.ops.sessions, "analysis-progress.html"],
+      ["진행 중", d.ops.in_progress, "analysis-progress.html"],
+      ["NCS 대기", d.ops.ncs_wait, "evaluation-detail.html"],
+      ["실패", d.ops.fail, "analysis-progress.html", true],
+      ["평균", d.ops.avg, "dashboard.html"],
+      ["주의", d.ops.warn, "analysis-progress.html", false, true],
+      ["기술자", d.ops.workers, "workers-list.html"],
+    ].map(([k,v,href,fail,warn]) =>
+      `<a class="ops-item${fail?" fail":""}${warn?" warn":""}" href="${href}"><strong>${v}</strong><span>${k}</span></a>`
     ).join("");
-    document.querySelector("#recent-table tbody").innerHTML = d.recent.map(r => {
-      const st = r.status === "분석완료" ? "ok" : "warn";
-      return `<tr>
-        <td class="name">${r.worker}</td>
-        <td>${r.task}</td>
-        <td><span class="tag-asm">${UR_DATA.taskTypeLabel(r.type)}</span></td>
-        <td>${UR_DATA.productCategoryLabel(r.product_category)}</td>
+
+    const g = d.grade_dist;
+    document.getElementById("grade-dist").innerHTML = [
+      ["초급", g.beginner],
+      ["중급", g.intermediate],
+      ["고급", g.advanced],
+    ].map(([k,v]) => `<div class="grade-cell"><p class="v">${v}</p><p class="k">${k}</p></div>`).join("");
+
+    document.getElementById("compare").innerHTML = d.compare.map(c => `
+      <div class="compare-row">
+        <span class="id">${c.id}</span>
+        <span>시스템 <strong>${c.ai}</strong></span>
+        <span>평가자 <strong>${c.expert}</strong> · ${c.expertLabel}</span>
+      </div>`).join("");
+
+    document.getElementById("recent-body").innerHTML = d.recent.map(r => `
+      <tr>
+        <td><span class="name">${r.sv}</span><span class="id">${r.sid}</span></td>
+        <td>${r.worker}</td>
+        <td>${r.task}<br /><span class="tag-asm">${UR_DATA.taskTypeLabel(r.type)}</span></td>
         <td>${r.date}</td>
-        <td>${r.duration}</td>
-        <td>${r.score === "—" ? "—" : `<span style="color:var(--brand);font-weight:700;">${r.score}</span>점`}</td>
-        <td><span class="pill ${st}">${r.status === "분석완료" ? "분석 완료" : r.status === "분석대기" ? "분석 대기" : r.status}</span></td>
-      </tr>`;
-    }).join("");
+        <td>${r.media}</td>
+        <td>${r.score === "—" ? `<span class="pill warn">${r.status}</span>` : `<strong style="color:var(--brand)">${r.score}</strong>`}</td>
+      </tr>`).join("");
+
+    document.getElementById("review-n").textContent = d.review_needed.length;
+    document.getElementById("review").innerHTML = d.review_needed.map(r =>
+      `<a class="review-item" href="analysis-progress.html"><strong>${r.worker}</strong><span>${r.job}</span><span class="pill warn">${r.status}</span></a>`
+    ).join("");
   </script>
 </body>
 </html>

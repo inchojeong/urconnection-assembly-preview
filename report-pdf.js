@@ -18,15 +18,43 @@
     .map(([k, v]) => `<div class="info-box"><p class="k">${k}</p><p class="v">${v}</p></div>`)
     .join("");
 
-  document.getElementById("r-skill").textContent = A.skill_score;
-  document.getElementById("r-grade").textContent = "고급";
+  document.getElementById("r-skill").textContent = A.ncs_avg;
+  document.getElementById("r-grade").textContent = A.grade;
   document.getElementById("r-seq").textContent = A.sequence_score + "%";
+  const rNcs = document.getElementById("r-ncs");
+  if (rNcs) rNcs.textContent = A.ai_ref_score;
 
   const hint = document.getElementById("r-profile-hint");
   if (hint) {
     hint.textContent =
-      `적용 평가기준: ${profile.name} · ` +
-      profile.weights.map(([k, v]) => `${k} ${v}%`).join(" · ");
+      `NCS ${A.ncs_avg}/5 · ${A.grade} · AI 참고 ${A.ai_ref_score}점 · ` +
+      `순서오류 ${A.labeling_summary.sequence_errors} · 재작업 ${A.labeling_summary.rework} · 공구재탐색 ${A.labeling_summary.tool_research}`;
+  }
+
+  const ncsHost = document.getElementById("r-ncs-items");
+  if (ncsHost) {
+    ncsHost.innerHTML = UR_DATA.ncsRubric
+      .map(
+        (r) =>
+          `<tr><td><span class="id">${r.code}</span> ${r.title}</td><td>${r.score}</td><td>${r.evidence}</td></tr>`
+      )
+      .join("");
+  }
+
+  const evHost = document.getElementById("r-events");
+  if (evHost) {
+    evHost.innerHTML = (A.evaluation_events || [])
+      .map(
+        (ev) =>
+          `<tr><td>${ev.start}${ev.end !== ev.start ? " ~ " + ev.end : ""}</td><td>${ev.label}</td><td><span class="id">${ev.event_type}</span></td></tr>`
+      )
+      .join("");
+  }
+
+  const opinion = document.getElementById("r-opinion");
+  if (opinion) {
+    opinion.textContent =
+      `작업순서 오류 ${A.labeling_summary.sequence_errors}건 · 필수공정 누락 없음 · 재작업 ${A.labeling_summary.rework}회 · 공구 재탐색 ${A.labeling_summary.tool_research}건 · NCS ${A.ncs_avg}점 → ${A.grade}`;
   }
 
   document.getElementById("r-scores").innerHTML = A.scores

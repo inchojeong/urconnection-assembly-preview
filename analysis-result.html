@@ -22,31 +22,28 @@
     <div class="content">
       <header class="topbar">
         <div>
-          <h1>세션 종합 분석</h1>
-          <p class="meta">AI 종합 분석 결과 · Stage/Event 타임라인 · 숙련도</p>
+          <h1>라벨링 결과 조회</h1>
+          <p class="meta">Stage/Event · Feature 근거 · NCS 평가 전 확인</p>
         </div>
         <div class="top-actions">
           <a class="btn" href="labeling-timeline.html">Stage/Event 라벨링</a>
-          <a class="btn" href="evaluation-detail.html">숙련도 최종 평가</a>
-          <a class="btn primary" href="report-pdf.html">PDF 출력</a>
+          <a class="btn primary" href="evaluation-detail.html">NCS 평가</a>
+          <a class="btn" href="report-pdf.html">PDF 출력</a>
         </div>
       </header>
       <main class="main">
         <section class="card">
-          <div class="card-h"><div><h2>세션 정보</h2><p>작업자 · 작업 · 제품 · 영상</p></div>
+          <div class="card-h"><div><h2>세션 정보</h2><p>영상은 점수를 만들지 않습니다. Timeline·Event가 NCS 근거가 됩니다.</p></div>
             <span class="badge" id="type-badge"></span>
           </div>
           <div class="card-b"><div class="info-row" id="basic"></div></div>
         </section>
 
         <section class="card">
-          <div class="card-h"><div><h2>AI 종합 분석 결과</h2><p>숙련도 · 작업시간 · 순서 정합률</p></div></div>
+          <div class="card-h"><div><h2>라벨링 · Feature 요약</h2><p>평가자에게 객관적 근거 제공 · 작업시간은 보조 근거</p></div></div>
           <div class="card-b">
-            <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);">
-              <div class="kpi-card"><p class="k">숙련도</p><p class="v brand" id="skill-v"></p></div>
-              <div class="kpi-card"><p class="k">작업시간</p><p class="v" id="dur-v"></p></div>
-              <div class="kpi-card"><p class="k">순서 정합률</p><p class="v" id="seq-v"></p></div>
-            </div>
+            <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);" id="sum-kpis"></div>
+            <p class="help" id="sum-note" style="margin-top:0.65rem;"></p>
           </div>
         </section>
 
@@ -122,47 +119,22 @@
         </section>
 
         <section class="card">
-          <div class="card-h"><div><h2>점수 구성</h2><p>세부 점수 · 주요 감점요인</p></div>
+          <div class="card-h"><div><h2>AI 참고 Feature</h2><p>손 이동량 · 반복 · Pose 안정성 등 · 최종 등급은 NCS에서 확정</p></div>
             <span class="badge" id="grade-badge"></span>
           </div>
           <div class="card-b">
             <div class="grid-2">
               <div>
-                <p style="margin:0 0 0.6rem;font-size:1.1rem;font-weight:700;">종합 숙련도 <span class="brand" id="skill-big" style="color:var(--brand);"></span></p>
+                <p style="margin:0 0 0.6rem;font-size:1.1rem;font-weight:700;">AI 참고 <span class="brand" id="skill-big" style="color:var(--brand);"></span></p>
                 <div class="score-bars" id="score-bars"></div>
               </div>
               <div>
-                <h3 style="margin:0 0 0.45rem;font-size:0.85rem;">주요 감점요인</h3>
+                <h3 style="margin:0 0 0.45rem;font-size:0.85rem;">관찰 포인트</h3>
                 <ul id="deducts" style="margin:0;padding-left:1.1rem;font-size:0.8rem;line-height:1.65;"></ul>
+                <div class="actions-bar" style="margin-top:0.85rem;">
+                  <a class="btn primary" href="evaluation-detail.html">NCS 기반 숙련도 평가로 이동</a>
+                </div>
               </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="card-h"><div><h2>전문가 최종 평가</h2><p>AI 분석 결과 및 세션 전체 수행 근거 기반 최종 숙련도 평가</p></div></div>
-          <div class="card-b">
-            <div class="grid-2">
-              <label class="field"><span>체결 품질</span>
-                <select><option>양호</option><option selected>보통</option><option>미흡</option></select>
-              </label>
-              <label class="field"><span>작업 결과물 판정</span>
-                <select><option selected>합격</option><option>조건부</option><option>불합격</option></select>
-              </label>
-              <label class="field"><span>작업 결과 적정성</span>
-                <select><option selected>적정</option><option>보완 필요</option></select>
-              </label>
-              <label class="field"><span>숙련도 등급</span>
-                <select><option>초급</option><option>중급</option><option selected>고급</option></select>
-              </label>
-            </div>
-            <label class="field" style="margin-top:0.65rem;"><span>전문가 평가 의견</span>
-              <textarea rows="3">순서 정합은 양호하나 3단계 지연·공구 재탐색으로 시간·효율 점수가 낮아졌습니다. 부품 정렬 반복을 줄이면 즉시 투입 가능 수준입니다.</textarea>
-            </label>
-            <div class="actions-bar">
-              <button type="button" class="btn primary" onclick="toast('최종 평가를 저장했습니다. (로컬 미리보기)')">최종 평가 확정</button>
-              <a class="btn" href="evaluation-detail.html">숙련도 최종 평가</a>
-              <a class="btn" href="report-pdf.html">PDF 출력</a>
             </div>
           </div>
         </section>
@@ -172,30 +144,37 @@
   <script src="data.js"></script>
   <script src="shared.js"></script>
   <script>
-    mountShell("eval");
+    mountShell("analysis");
     const A = UR_DATA.analysis;
     const total = A.duration_sec;
 
     document.getElementById("type-badge").textContent = UR_DATA.taskTypeLabel(A.task_type);
-    const profile = UR_DATA.resolveProfile(A.task_type, A.product_category);
     document.getElementById("basic").innerHTML = [
-      ["작업자", A.worker],
+      ["등록번호", `${A.sv} · ${A.sid}`],
+      ["기술자", A.worker],
       ["작업명", A.task_name],
       ["작업유형", UR_DATA.taskTypeLabel(A.task_type)],
       ["제품군", UR_DATA.productCategoryLabel(A.product_category)],
       ["세부 제품", A.product_model],
-      ["평가 프로파일", profile.id],
       ["작업일", A.date],
-      ["영상길이", A.video_len],
+      ["미디어", A.media || A.video_len],
     ].map(([k,v]) => `<div class="info-box"><p class="k">${k}</p><p class="v">${v}</p></div>`).join("");
 
-    document.getElementById("skill-v").textContent = A.skill_score + "점";
-    document.getElementById("dur-v").textContent = A.video_len;
-    document.getElementById("seq-v").textContent = A.sequence_score + "%";
+    const sum = A.labeling_summary;
+    document.getElementById("sum-kpis").innerHTML = [
+      ["작업 진행", sum.stages_done],
+      ["순서 오류", sum.sequence_errors + "건"],
+      ["반복", sum.rework + "회"],
+      ["공구 재탐색", sum.tool_research + "건"],
+      ["부품 누락", sum.part_missing + "건"],
+      ["작업시간", sum.total_time],
+    ].map(([k,v],i) => `<div class="kpi-card"><p class="k">${k}</p><p class="v${i===0?" brand":""}">${v}</p></div>`).join("");
+    document.getElementById("sum-note").textContent = sum.note;
+
     document.getElementById("vid-name").textContent = A.video;
     document.getElementById("vid-len").textContent = A.video_len;
-    document.getElementById("skill-big").textContent = A.skill_score + "점 / " + A.grade;
-    document.getElementById("grade-badge").textContent = A.grade;
+    document.getElementById("skill-big").textContent = A.ai_ref_score + "점 (참고)";
+    document.getElementById("grade-badge").textContent = "NCS " + A.grade + " 제안";
     document.getElementById("seq-pct").textContent = A.sequence_score + "%";
     document.getElementById("seq-notes").textContent = A.sequence_notes.join(" · ");
 

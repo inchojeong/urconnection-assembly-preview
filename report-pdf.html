@@ -45,24 +45,24 @@
 
             <div class="sv-hero" data-block="hero">
               <div class="sv-metric">
-                <p class="k">AI 분석 점수</p>
+                <p class="k">NCS 평가 평균</p>
                 <p class="v brand" id="r-skill"></p>
-                <p class="hint">분석 항목별 가중치 반영 · 참고 지표</p>
+                <p class="hint">NCS 평가 평균 / 5</p>
               </div>
               <div class="sv-metric">
-                <p class="k">AI 분석 등급</p>
+                <p class="k">숙련도 등급</p>
                 <p class="v" id="r-grade"></p>
-                <p class="hint">숙련자 기준 데이터 대비</p>
+                <p class="hint">4.5↑고급 · 3.5~4.49중급 · 3.5↓초급</p>
               </div>
               <div class="sv-metric">
                 <p class="k">순서 정합률</p>
                 <p class="v" id="r-seq"></p>
-                <p class="hint">sequence conformity</p>
+                <p class="hint">Timeline 보조 근거</p>
               </div>
               <div class="sv-metric">
-                <p class="k">NCS 평가 점수</p>
-                <p class="v" id="r-ncs">3.8/5</p>
-                <p class="hint">환산 76 · 고급 제안</p>
+                <p class="k">AI 참고 점수</p>
+                <p class="v" id="r-ncs">82</p>
+                <p class="hint">최종 확정 전 참고값</p>
               </div>
             </div>
 
@@ -72,23 +72,43 @@
             </section>
 
             <section class="sv-block">
-              <h2>2. 종합 숙련도 · 점수 구성</h2>
+              <h2>2. NCS 평가 결과</h2>
               <p class="help" id="r-profile-hint" style="margin:0 0 0.55rem;"></p>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead><tr><th>수행준거</th><th>점수</th><th>판정 근거</th></tr></thead>
+                  <tbody id="r-ncs-items"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="sv-block">
+              <h2>3. AI 참고 Feature</h2>
               <div class="score-bars" id="r-scores"></div>
             </section>
 
             <section class="sv-block">
-              <h2>3. 작업 단계 분석</h2>
+              <h2>4. Stage 수행 결과</h2>
               <div class="table-wrap">
                 <table class="data-table">
-                  <thead><tr><th>단계</th><th>실제시간</th><th>기준시간</th><th>결과</th></tr></thead>
+                  <thead><tr><th>세부 작업명</th><th>실제시간</th><th>기준시간</th><th>결과</th></tr></thead>
                   <tbody id="r-stages"></tbody>
                 </table>
               </div>
             </section>
 
             <section class="sv-block">
-              <h2>4. 작업 순서 분석</h2>
+              <h2>5. Event 발생 결과</h2>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead><tr><th>시간</th><th>이벤트</th><th>코드</th></tr></thead>
+                  <tbody id="r-events"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="sv-block">
+              <h2>6. 작업 순서 분석</h2>
               <p style="margin:0 0 0.35rem;font-size:0.75rem;color:var(--muted);">표준 순서</p>
               <div class="seq-row" id="r-seq-std"></div>
               <p style="margin:0.45rem 0 0.35rem;font-size:0.75rem;color:var(--muted);">실제 수행</p>
@@ -97,17 +117,22 @@
             </section>
 
             <section class="sv-block">
-              <h2>5. 주요 감점 요인</h2>
+              <h2>7. 주요 관찰 · 감점 요인</h2>
               <ul id="r-deducts" style="margin:0;padding-left:1.1rem;font-size:0.82rem;line-height:1.65;"></ul>
             </section>
 
             <section class="sv-block">
-              <h2>6. 개선 권고사항</h2>
+              <h2>8. 전문가 의견</h2>
+              <p style="margin:0;font-size:0.85rem;line-height:1.55;" id="r-opinion"></p>
+            </section>
+
+            <section class="sv-block">
+              <h2>9. 개선 필요사항</h2>
               <ul style="margin:0;padding-left:1.1rem;font-size:0.82rem;line-height:1.65;">
-                <li>3단계(내부 부품 분리) 기준시간 준수를 위한 풀러 사전 배치</li>
-                <li>부품 정렬 단계 반복 방지 — 정렬 체크리스트 1회 확인 후 진행</li>
-                <li>공구 재탐색 동선 최소화 (작업대 공구 위치 표준화)</li>
+                <li>공구 사전 배치로 재탐색 동선 최소화</li>
+                <li>기어 정렬 단계 1회 확인 후 진행 (반복 방지)</li>
                 <li>표준 순서 4→3 역전 방지 교육</li>
+                <li>볼트 체결 전 순서 체크리스트 확인</li>
               </ul>
             </section>
           </article>

@@ -258,21 +258,80 @@ window.UR_DATA = {
     ],
   },
 
+  /* 등급기준 (관리자 설정) — NCS 평균 1~5 */
+  gradeBands: [
+    { grade: "고급", min: 4.5, max: 5.0 },
+    { grade: "중급", min: 3.5, max: 4.49 },
+    { grade: "초급", min: 0, max: 3.49 },
+  ],
+
+  /* NCS 수행준거 ↔ Timeline/Event 근거 */
+  ncsRubric: [
+    {
+      code: "E1",
+      title: "작업절차에 따라 부품을 분해할 수 있다",
+      desc: "표준 Stage 순서·필수 공정 준수",
+      score: 5,
+      evidence: "Stage 순서 정상 구간 다수 · 필수 Stage 누락 없음 · 순서 오류 1건(보조)",
+    },
+    {
+      code: "E2",
+      title: "적절한 공구를 선택하여 사용할 수 있다",
+      desc: "공구 선택·파지·교체",
+      score: 4,
+      evidence: "정상 공구 사용 · 잘못된 공구 0건 · 공구 재탐색 1건",
+    },
+    {
+      code: "E3",
+      title: "부품을 손상 없이 취급·결합할 수 있다",
+      desc: "부품 취급·위치 맞춤·결합",
+      score: 4,
+      evidence: "부품 누락 없음 · 기어 정렬 재시도 1회 · 재작업 Event 1건",
+    },
+    {
+      code: "E4",
+      title: "조립 완성도를 확인하고 기능을 검증할 수 있다",
+      desc: "검사·기능 확인 Stage",
+      score: 5,
+      evidence: "검사·기능 확인 Stage 수행 · 결과물 판정 합격",
+    },
+    {
+      code: "E5",
+      title: "안전규정과 작업장 정리를 준수할 수 있다",
+      desc: "안전·마무리",
+      score: 4,
+      evidence: "안전 Event 없음 · 마무리 Stage 완료",
+    },
+  ],
+
   dashboard: {
-    workers: 12,
-    done_videos: 28,
-    queued_videos: 5,
-    avg_skill: 81,
-    avg_duration: "09:18",
-    error_count: 17,
+    ops: { sessions: 7, in_progress: 2, ncs_wait: 2, fail: 0, avg: "4.3", warn: 2, workers: 5 },
+    grade_dist: { beginner: 2, intermediate: 2, advanced: 1 },
+    compare: [
+      { id: "W-001", ai: 82, expert: 4.4, expertLabel: "중급" },
+      { id: "W-002", ai: 86, expert: 4.2, expertLabel: "중급" },
+      { id: "W-003", ai: 74, expert: 3.2, expertLabel: "초급" },
+    ],
+    review_needed: [
+      { worker: "BISHAL THAPA", job: "분해·재조립", status: "분석 대기" },
+      { worker: "NGUYEN VAN HUNG", job: "분해", status: "NCS 검토 대기" },
+      { worker: "SOMCHAI PRASERT", job: "분해·재조립", status: "라벨링 중" },
+    ],
     recent: [
-      { worker: "AKMAL KARIMOV", task: "기어박스 분해·재조립", type: "ASSEMBLY", product_category: "GEARBOX", date: "2026-10-03", duration: "18분 32초", score: 82, status: "분석완료" },
-      { worker: "DO TIEN DUC", task: "감속기 A형 분해·재조립", type: "DISASSEMBLY_ASSEMBLY", product_category: "GEARBOX", date: "2026-10-02", duration: "08분 40초", score: 82, status: "분석완료" },
-      { worker: "NGUYEN VAN HUNG", task: "감속기 A형 분해", type: "DISASSEMBLY", product_category: "GEARBOX", date: "2026-10-02", duration: "06분 12초", score: 74, status: "분석완료" },
-      { worker: "BISHAL THAPA", task: "기어박스 조립", type: "ASSEMBLY", product_category: "GEARBOX", date: "2026-10-01", duration: "—", score: "—", status: "분석대기" },
-      { worker: "SOMCHAI PRASERT", task: "감속기 A형 분해·재조립", type: "DISASSEMBLY_ASSEMBLY", product_category: "GEARBOX", date: "2026-09-30", duration: "10분 05초", score: 88, status: "분석완료" },
+      { sv: "SV-2026-1003-001", sid: "S-006", worker: "AKMAL KARIMOV", task: "기어박스 조립", type: "ASSEMBLY", product_category: "GEARBOX", date: "2026-10-03", media: "영상 1 · 사진 2", pipeline: "분석 완료", score: "4.2", status: "완료" },
+      { sv: "SV-2026-1002-001", sid: "S-004", worker: "DO TIEN DUC", task: "감속기 A형 분해·재조립", type: "DISASSEMBLY_ASSEMBLY", product_category: "GEARBOX", date: "2026-10-02", media: "영상 2 · 사진 3", pipeline: "분석 완료", score: "4.4", status: "완료" },
+      { sv: "SV-2026-1002-002", sid: "S-005", worker: "NGUYEN VAN HUNG", task: "감속기 A형 분해", type: "DISASSEMBLY", product_category: "GEARBOX", date: "2026-10-02", media: "영상 1 · 사진 1", pipeline: "분석 완료", score: "—", status: "NCS 검토" },
+      { sv: "SV-2026-1001-001", sid: "S-007", worker: "BISHAL THAPA", task: "기어박스 조립", type: "ASSEMBLY", product_category: "GEARBOX", date: "2026-10-01", media: "영상 1 · 사진 0", pipeline: "분석 대기 5%", score: "—", status: "진행" },
+      { sv: "SV-2026-0930-001", sid: "S-003", worker: "SOMCHAI PRASERT", task: "감속기 A형 분해·재조립", type: "DISASSEMBLY_ASSEMBLY", product_category: "GEARBOX", date: "2026-09-30", media: "영상 1 · 사진 2", pipeline: "라벨링 중", score: "—", status: "진행" },
     ],
   },
+
+  sessions: [
+    { sv: "SV-2026-1003-001", sid: "S-006", worker: "AKMAL KARIMOV", worker_id: "W-002", job: "분해조립", task: "기어박스 조립", type: "ASSEMBLY", product_category: "GEARBOX", date: "2026-10-03", media: "영상 1 · 사진 2", pipeline: "분석 완료", pipeline_pct: 100, score: "4.2", actions: ["ncs", "analysis"] },
+    { sv: "SV-2026-1002-001", sid: "S-004", worker: "DO TIEN DUC", worker_id: "W-001", job: "분해조립", task: "감속기 A형 분해·재조립", type: "DISASSEMBLY_ASSEMBLY", product_category: "GEARBOX", date: "2026-10-02", media: "영상 2 · 사진 3", pipeline: "분석 완료", pipeline_pct: 100, score: "4.4", actions: ["ncs", "analysis", "label"] },
+    { sv: "SV-2026-1002-002", sid: "S-005", worker: "NGUYEN VAN HUNG", worker_id: "W-003", job: "분해조립", task: "감속기 A형 분해", type: "DISASSEMBLY", product_category: "GEARBOX", date: "2026-10-02", media: "영상 1 · 사진 1", pipeline: "포즈추출 45%", pipeline_pct: 45, score: "—", actions: ["analysis"] },
+    { sv: "SV-2026-1001-001", sid: "S-007", worker: "BISHAL THAPA", worker_id: "W-004", job: "분해조립", task: "기어박스 조립", type: "ASSEMBLY", product_category: "GEARBOX", date: "2026-10-01", media: "영상 1 · 사진 0", pipeline: "분석 대기 5%", pipeline_pct: 5, score: "—", actions: ["analysis"] },
+  ],
 
   workers: [
     { id: "W-001", name: "DO TIEN DUC", org: "서용건설(주)", job: "분해조립", videos: 8, recent: "감속기 A형 분해·재조립", avg_skill: 84, avg_time: "09:05", errors: 2 },
@@ -295,18 +354,34 @@ window.UR_DATA = {
   },
 
   analysis: {
+    sv: "SV-2026-1002-001",
+    sid: "S-004",
     worker: "DO TIEN DUC",
+    worker_id: "W-001",
     task_name: "감속기 분해·재조립 평가",
     task_type: "DISASSEMBLY_ASSEMBLY",
     product_category: "GEARBOX",
     product_model: "감속기 A형",
     date: "2026-10-02",
     video: "gearbox_duc_01.mp4",
+    video_side: "gearbox_duc_01_side.mp4",
     video_len: "06:00",
-    skill_score: 82,
-    grade: "고급",
+    media: "영상 2 · 사진 3",
+    /* AI 참고 지표 — 최종 등급은 NCS */
+    ai_ref_score: 82,
+    ncs_avg: 4.4,
+    grade: "중급",
     sequence_score: 87.5,
     duration_sec: 360,
+    labeling_summary: {
+      stages_done: "13 / 13",
+      sequence_errors: 1,
+      rework: 1,
+      tool_research: 1,
+      part_missing: 0,
+      total_time: "06:00",
+      note: "작업시간은 NCS 평가 보조 근거이며, 초과만으로 자동 감점하지 않습니다.",
+    },
     scores: [
       ["순서정합성", 90],
       ["작업시간", 78],
