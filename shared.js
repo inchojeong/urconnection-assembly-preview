@@ -1,24 +1,16 @@
 function mountShell(active) {
   const links = [
-    ["대시보드", "dashboard.html"],
     ["등록", "task-register.html"],
-    ["작업 기준", "task-models.html"],
     ["라벨링", "labeling-timeline.html"],
     ["숙련도 평가", "evaluation-detail.html"],
-    ["작업 현황", "analysis-progress.html"],
-    ["기술자", "workers-list.html"],
   ];
 
   const map = {
-    dash: "대시보드",
     register: "등록",
-    models: "작업 기준",
     label: "라벨링",
     eval: "숙련도 평가",
-    progress: "작업 현황",
-    workers: "기술자",
     report: "숙련도 평가",
-    analysis: "작업 현황",
+    analysis: "라벨링",
   };
 
   const nav = links
